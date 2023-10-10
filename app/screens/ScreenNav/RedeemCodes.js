@@ -60,7 +60,7 @@ export const RedeemCode = () => {
       // console.log("codes::::::::::::::::::", codes);
       return codes;
     }
-    if (Type ==="PersonalCode") {
+    if (Type === "PersonalCode") {
       for (let i = 0; i < 10; i++) {
         codes.push({
           code: CodeText,
@@ -74,8 +74,6 @@ export const RedeemCode = () => {
       codesRef.current = codes;
       // console.log("codes::::::::::::::::::", codes);
       return codes;
-
-
     } else {
     }
   };
@@ -225,7 +223,7 @@ export const RedeemCode = () => {
       >
         <Image source={logos.blanco} style={{ width: 180, height: 160 }} />
       </View>
-      <View style={{ backgroundColor: "black", flex: 5 }}>
+      <View style={{ backgroundColor: "black", flex: 10 }}>
         <View
           style={{
             backgroundColor: theme.colors.blackSegunda,
@@ -349,7 +347,11 @@ export const RedeemCode = () => {
                 border={8}
                 size={100}
                 onPress={() => {
-                  if (ValuePlata != undefined && ValueGolden != undefined && CodeText !=undefined) {
+                  if (
+                    ValuePlata != undefined &&
+                    ValueGolden != undefined &&
+                    CodeText != undefined
+                  ) {
                     generateCodes(ValuePlata, ValueGolden, "PersonalCode");
                     console.log(
                       "mis codes son--------------------------->",
@@ -423,7 +425,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   textIn: {
-    marginBottom: 75,
+    marginBottom: 15,
     marginTop: 10,
   },
 });

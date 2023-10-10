@@ -20,8 +20,11 @@ import { LoadGeneral } from "../../Components/GeneralComponents/LoadGeneral";
 import { fetchDinamicData } from "../../Services/firebase";
 import { Card } from "../../Components/Predictions/Card";
 import StyledText from "../../theme/StyledText";
+import ModalEdit from "../../Components/Products/ModalEdit";
 
 export const Products = ({ navigation }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [item, setItem] = useState(null);
   const [promotionEdit, setPromotionEdit] = useState([]);
   const [image, setImage] = useState(null);
   const editing = useRef(false);
@@ -33,40 +36,54 @@ export const Products = ({ navigation }) => {
     loadData();
   }, [refresh]);
 
-  const openModal = () => {
-    setModalVisible(true);
+  const handleInteractiveModal = () => {
+    setModalVisible(!modalVisible);
   };
 
-  //   const renderItem = ({ item }) => {
-  //     return (
-  //       <Card
-  //         item={item}
-  //         onPressEdit={() => {
-  //           editing.current = true;
-  //           setPromotionEdit(Object.assign({}, item));
-  //           openModal();
-  //         }}
-  //         onPressDelete={() => {
-  //           console.log("mi iten a eliminar es::::::::::::::::", item);
-  //           deletedPredictionDB(item);
-  //         }}
-  //       />
-  //     );
-  //   };
+  const loadData = async () => {
+    setLoad(true);
+    try {
+      let data = await fetchDinamicData("products");
+      console.log("los datos de productos son::::::::::::::::::", data);
+
+      data.sort((a, b) => {
+        const stockA = a?.stock || 0;
+        const stockB = b?.stock || 0;
+
+        const compareStock = stockB - stockA;
+
+        if (compareStock !== 0) {
+          return compareStock;
+        }
+
+        return a.name.localeCompare(b.name);
+      });
+
+      setDataDB(data);
+    } catch (error) {
+      console.error("Error al cargar los datos:", error);
+    } finally {
+      setLoad(false);
+    }
+  };
 
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("triviaDetails", {
-            trivia: item,
-            setRefresh: setRefresh,
-            refresh: refresh,
-          })
+          // navigation.navigate("triviaDetails", {
+          //   trivia: item,
+          //   setRefresh: setRefresh,
+          //   refresh: refresh,
+          // })
+          {
+            setItem(item);
+            handleInteractiveModal();
+          }
         }
         style={{
           flex: 1,
-          backgroundColor: "black",
+          backgroundColor: item?.stock ? theme.colors.orangeSegunda : "black",
           margin: 5,
           borderRadius: 5,
           flexDirection: "row",
@@ -80,7 +97,7 @@ export const Products = ({ navigation }) => {
               width: 100,
               height: 120,
               borderRadius: 10,
-              resizeMode: "contain",
+              resizeMode: "stretch",
             }}
           />
         </View>
@@ -111,26 +128,29 @@ export const Products = ({ navigation }) => {
               Stock: {item.stock}{" "}
             </StyledText>
           )}
-          <View
-            style={{
-              flex: 1,
-              //backgroundColor: "red",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
+          <View>
             <StyledText
               color={"white"}
               style={{
                 fontSize: 14,
                 marginVertical: 5,
-                //backgroundColor: "red",
                 flex: 1,
                 justifyContent: "center",
               }}
             >
-              Monedas: {item.price}{" "}
+              Proporción: {item.goldRatio}
+              {"% "}
+              <Image
+                source={ImagenImport.coin}
+                style={{
+                  width: 15,
+                  height: 15,
+                  resizeMode: "contain",
+                  flex: 1,
+                }}
+              />{" "}
+              {item.silverRatio}
+              {"% "}
               <Image
                 source={ImagenImport.coin}
                 style={{
@@ -142,77 +162,85 @@ export const Products = ({ navigation }) => {
               />
             </StyledText>
           </View>
+          <View style={{ flexDirection: "row" }}>
+            <View
+              style={{
+                flex: 1,
+                //backgroundColor: "red",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <StyledText
+                color={"white"}
+                style={{
+                  fontSize: 14,
+                  marginVertical: 5,
+                  //backgroundColor: "red",
+                  flex: 1,
+                  justifyContent: "center",
+                }}
+              >
+                M. oro: {item.goldCoins}{" "}
+                <Image
+                  source={ImagenImport.coin}
+                  style={{
+                    width: 15,
+                    height: 15,
+                    resizeMode: "contain",
+                    flex: 1,
+                  }}
+                />
+              </StyledText>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                //backgroundColor: "red",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <StyledText
+                color={"white"}
+                style={{
+                  fontSize: 14,
+                  marginVertical: 5,
+                  //backgroundColor: "red",
+                  flex: 1,
+                  justifyContent: "center",
+                }}
+              >
+                M. plata: {item.silverCoins}{" "}
+                <Image
+                  source={ImagenImport.coin}
+                  style={{
+                    width: 15,
+                    height: 15,
+                    resizeMode: "contain",
+                    flex: 1,
+                  }}
+                />
+              </StyledText>
+            </View>
+          </View>
         </View>
       </TouchableOpacity>
     );
   };
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalNewPredictionVisible, ssetModalNewPredictionVisible] =
-    useState(false);
-
-  const loadData = async () => {
-    setLoad(true);
-    try {
-      const data = await fetchDinamicData("products");
-      console.log("los datos de productos son::::::::::::::::::", data);
-      setDataDB(data);
-    } catch (error) {}
-    setLoad(false);
-  };
-
-  const deletedPredictionDB = async (deleted) => {
-    setLoad(true);
-    console.log("ENTRAMOS A LA FUNCION ELIMINAR");
-
-    try {
-      const filename1 = deleted.avatarLeft.substring(
-        deleted.avatarLeft.lastIndexOf("/") + 1
-      );
-      console.log("RUTA IMAGEN IZQUIERDA=================", filename1);
-
-      const filename2 = deleted.avatarRight.substring(
-        deleted.avatarRight.lastIndexOf("/") + 1
-      );
-      console.log("RUTA IMAGEN DERECHA===============", filename2);
-
-      const filenameLeft = filename1.split("?")[0];
-      const imgLeft = decodeURIComponent(filenameLeft);
-
-      console.log("RUTA DECODIFICADA Izquierda===============", imgLeft);
-
-      const filename = filename2.split("?")[0];
-      const imgRight = decodeURIComponent(filename);
-      console.log("RUTA DECODIFICADA DERECHA===============", imgRight);
-      console.log("Objeto deleted -------------", deleted);
-      // console.log("el nobre de mi imagen es::::::", filename);
-      loadData();
-    } catch (error) {}
-    setLoad(false);
-  };
-
-  const handleOpenModal = () => {
-    // console.log("el EDITING antes es:", editing);
-
-    editing.current = false;
-    setPromotionEdit(null);
-    // setEditing(false);
-    // console.log("el EDITING despues es:", editing);
-    setModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalVisible(false);
-  };
   return (
     <View style={styles.container}>
       {/* Modal para elegir que tipo de pronóstico nuevo quiere crear */}
-      <Modal
-        visible={modalNewPredictionVisible}
-        animationType="slide"
-        transparent
-        style={styles.modal}
-      ></Modal>
+      <ModalEdit
+        item={item}
+        visible={modalVisible}
+        onCloseModal={handleInteractiveModal}
+        refresh={refresh}
+        setRefresh={setRefresh}
+      />
       <View
         style={{
           backgroundColor: "black",
@@ -231,7 +259,7 @@ export const Products = ({ navigation }) => {
         />
         <Image
           source={logos.blanco}
-          style={{ width: 100, height: 80, resizeMode: "contain" }}
+          style={{ width: 100, height: 80, resizeMode: "stretch" }}
         />
       </View>
       <View style={{ backgroundColor: "black", flex: 4 }}>
@@ -263,15 +291,7 @@ export const Products = ({ navigation }) => {
         }}
         color="white"
       />
-      {/* Renderizamos el componente del modal solo cuando el estado es true */}
-      <ModalComponent
-        editing={editing.current}
-        data={promotionEdit}
-        visible={modalVisible}
-        onCloseModal={handleCloseModal}
-        image={image}
-        loadData={loadData}
-      />
+
       {load && <LoadGeneral load={load} />}
     </View>
   );

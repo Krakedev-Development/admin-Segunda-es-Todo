@@ -90,7 +90,10 @@ export const NotificationsForm = () => {
       });
     }
     setLoad(false);
-    Alert.alert("Notificaciones enviadas", " Ya está la huevada");
+    Alert.alert(
+      "Notificaciones enviadas",
+      "El mensaje se envió a todos los usuarios"
+    );
   };
 
   async function sendExpoNotification(token, title, body, imageUrl) {
