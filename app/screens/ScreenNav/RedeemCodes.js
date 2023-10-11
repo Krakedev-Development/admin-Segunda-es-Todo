@@ -49,9 +49,11 @@ export const RedeemCode = () => {
       for (let i = 0; i < 10; i++) {
         codes.push({
           code: generateRandomCode(),
-          status: false,
-          ValueGolden: ValueGolden,
-          ValuePlata: ValuePlata,
+          status: true,
+          value: {
+            goldCoins: parseInt(ValueGolden),
+            silverCoins: parseInt(ValuePlata),
+          },
           Type: Type,
         });
       }
@@ -64,9 +66,11 @@ export const RedeemCode = () => {
       for (let i = 0; i < 10; i++) {
         codes.push({
           code: CodeText,
-          status: false,
-          ValueGolden: ValueGolden,
-          ValuePlata: ValuePlata,
+          status: true,
+          value: {
+            goldCoins: parseInt(ValueGolden),
+            silverCoins: parseInt(ValuePlata),
+          },
           Type: Type,
         });
       }
@@ -313,18 +317,18 @@ export const RedeemCode = () => {
               />
 
               <TextInput
-                label="Monedas Plata."
-                value={ValuePlata}
-                onChangeText={setValuePlata}
+                label="Monedas Oro."
+                value={ValueGolden}
+                onChangeText={setValueGolden}
                 mode="outlined"
                 style={{ width: 200 }}
                 outlineStyle={styles.marcoEntradaCodigo}
                 keyboardType="numeric"
               />
               <TextInput
-                label="Monedas Oro."
-                value={ValueGolden}
-                onChangeText={setValueGolden}
+                label="Monedas Plata."
+                value={ValuePlata}
+                onChangeText={setValuePlata}
                 mode="outlined"
                 style={{ width: 200 }}
                 outlineStyle={styles.marcoEntradaCodigo}
