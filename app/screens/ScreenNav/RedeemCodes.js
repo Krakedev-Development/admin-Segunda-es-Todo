@@ -16,7 +16,8 @@ import { cerrarSesion } from "../../Services/AutenticacionSrv";
 import { getAuth } from "firebase/auth";
 import { SessionContext } from "../../context/SessionContext";
 import { LoadGeneral } from "../../Components/GeneralComponents/LoadGeneral";
-import { TextInput } from "react-native-paper";
+import { HelperText, TextInput } from "react-native-paper";
+import StyledText from "../../theme/StyledText";
 // import PDFLib from "react-native-pdf-lib";
 export const RedeemCode = () => {
   const [codes, setCodes] = useState([]);
@@ -28,6 +29,8 @@ export const RedeemCode = () => {
   const [ValuePlata, setValuePlata] = useState();
   const [CodigosGenerales, setCodigosGenerales] = useState(false);
   const [CodeText, setCodeText] = useState("");
+  const [errorInputsGeneral, setErrorInputsGeneral] = useState(false);
+  const [errorInputsCustom, setErrorInputsCustom] = useState(false);
 
   const generateRandomCode = () => {
     let code = "";
@@ -236,183 +239,278 @@ export const RedeemCode = () => {
             borderTopEndRadius: 20,
             alignItems: "center",
             justifyContent: "center",
+            padding: 20,
           }}
         >
           <View
             style={{
+              flex: 1,
               flexDirection: "row",
-              alignContent: "space-between",
-              marginVertical: 20,
-              marginTop: 40,
+              justifyContent: "space-around",
+              //paddingHorizontal: 20,
+              width: "100%",
+              //backgroundColor: "red",
+              //marginVertical: 20,
+              //marginTop: 20,
             }}
           >
-            <TouchableOpacity onPress={() => setCodigosGenerales(true)}>
-              <Text
+            <TouchableOpacity
+              style={{
+                backgroundColor: CodigosGenerales
+                  ? theme.colors.orangeSegunda
+                  : theme.colors.grey,
+                padding: 10,
+                borderRadius: 5,
+              }}
+              onPress={() => setCodigosGenerales(true)}
+            >
+              <StyledText
                 style={{
-                  marginHorizontal: 30,
-                  textDecorationLine: "underline",
-                  color: CodigosGenerales ? "white" : "black",
+                  //marginHorizontal: 30,
+                  //textDecorationLine: "underline",
+                  color: "white",
                 }}
               >
                 Codigos Generales
-              </Text>
+              </StyledText>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setCodigosGenerales(false)}>
-              <Text
+            <TouchableOpacity
+              style={{
+                backgroundColor: CodigosGenerales
+                  ? theme.colors.grey
+                  : theme.colors.orangeSegunda,
+                padding: 10,
+                borderRadius: 5,
+              }}
+              onPress={() => setCodigosGenerales(false)}
+            >
+              <StyledText
                 style={{
-                  marginHorizontal: 30,
-                  textDecorationLine: "underline",
-                  color: !CodigosGenerales ? "white" : "black",
+                  //marginHorizontal: 30,
+                  //textDecorationLine: "underline",
+                  color: "white",
                 }}
               >
                 Codigos Personalizados
-              </Text>
+              </StyledText>
             </TouchableOpacity>
           </View>
-          {CodigosGenerales ? (
-            <View>
-              <ButtonGeneral
-                icon={
-                  <Icon2
-                    name={"ticket"}
-                    size={80}
-                    type={"entypo"}
-                    color={"white"}
-                    style={{ marginRight: 5 }}
-                  />
-                }
-                background={theme.colors.orangeSegunda}
-                border={8}
-                size={100}
-                onPress={() => {
-                  if (ValuePlata != undefined && ValueGolden != undefined) {
-                    generateCodes(ValuePlata, ValueGolden, "GeneralCode");
-                    console.log(
-                      "mis codes son--------------------------->",
-                      codesRef.current
-                    );
-                    // saveCodes(codes);
-                    generarPDFyDescargar();
-                    console.log(
-                      "Valor de codigo:",
-                      ValuePlata,
-                      "Valor GOLd",
-                      ValueGolden
-                    );
-                    // generateRandomCode()
-                  } else {
-                    console.log(
-                      "No se puedieron generar los codigos de manera correcta"
-                    );
+          <View
+            style={{
+              flex: 10,
+              //backgroundColor: "green",
+              width: "100%",
+              alignItems: "flex-start",
+              padding: 10,
+            }}
+          >
+            {CodigosGenerales ? (
+              <View
+                style={
+                  {
+                    //flex: 10,
+                    //backgroundColor: "green",
+                    //width: "100%",
+                    //alignItems: "center",
+                    //padding: 10,
                   }
+                }
+              >
+                <TextGeneral
+                  text={"Código General"}
+                  color={"white"}
+                  size={18}
+                  style={[styles.textIn]}
+                />
+                <View style={{ flexDirection: "row", flex: 1, width: "100%" }}>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      label="Monedas Oro."
+                      value={ValueGolden}
+                      onChangeText={setValueGolden}
+                      mode="outlined"
+                      style={{ width: "95%" }}
+                      outlineStyle={styles.marcoEntradaCodigo}
+                      keyboardType="numeric"
+                      //error={!ValueGolden ? true : false}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      label="Monedas Plata."
+                      value={ValuePlata}
+                      onChangeText={setValuePlata}
+                      mode="outlined"
+                      style={{ width: "95%" }}
+                      outlineStyle={styles.marcoEntradaCodigo}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                </View>
+                {errorInputsGeneral && (
+                  <HelperText
+                    style={{
+                      color: "red",
+                      fontFamily: theme.fonts.textBold,
+                      fontSize: 16,
+                      bottom: 180,
+                    }}
+                  >
+                    LLene todos los campos correctamente
+                  </HelperText>
+                )}
+                <ButtonGeneral
+                  icon={
+                    <Icon2
+                      name={"ticket"}
+                      size={45}
+                      type={"entypo"}
+                      color={"white"}
+                      style={{ marginRight: 5 }}
+                    />
+                  }
+                  background={theme.colors.orangeSegunda}
+                  border={8}
+                  size={60}
+                  onPress={() => {
+                    if (
+                      ValuePlata != undefined ||
+                      (ValuePlata != null && ValueGolden != undefined) ||
+                      ValueGolden != null
+                    ) {
+                      setErrorInputsGeneral(false);
+                      generateCodes(ValuePlata, ValueGolden, "GeneralCode");
+                      console.log(
+                        "mis codes son--------------------------->",
+                        codesRef.current
+                      );
+                      // saveCodes(codes);
+                      generarPDFyDescargar();
+                      console.log(
+                        "Valor de codigo:",
+                        ValuePlata,
+                        "Valor GOLd",
+                        ValueGolden
+                      );
+                      // generateRandomCode()
+                    } else {
+                      console.log(
+                        "No se puedieron generar los codigos de manera correcta"
+                      );
+                      setErrorInputsGeneral(true);
+                    }
+                  }}
+                  width={"100%"}
+                />
+              </View>
+            ) : (
+              <View
+                style={{
+                  //backgroundColor: "red",
+                  width: "100%",
+                  height: "100%",
+                  flex: 1,
                 }}
-                width={200}
-              />
-              <TextGeneral
-                text={"Generar código"}
-                color={"white"}
-                size={18}
-                style={[styles.textIn]}
-              />
+              >
+                <TextGeneral
+                  text={"Generar código Personalizado"}
+                  color={"white"}
+                  size={18}
+                  style={[styles.textIn]}
+                />
+                <TextInput
+                  label="Genera el codigo"
+                  value={CodeText}
+                  onChangeText={setCodeText}
+                  mode="outlined"
+                  style={{ width: 200 }}
+                  outlineStyle={styles.marcoEntradaCodigo}
+                  keyboardType="numeric"
+                />
+                <View style={{ flexDirection: "row", flex: 1, width: "100%" }}>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      label="Monedas Plata."
+                      value={ValuePlata}
+                      onChangeText={setValuePlata}
+                      mode="outlined"
+                      style={{ width: "95%" }}
+                      outlineStyle={styles.marcoEntradaCodigo}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      label="Monedas Oro."
+                      value={ValueGolden}
+                      onChangeText={setValueGolden}
+                      mode="outlined"
+                      style={{ width: "95%" }}
+                      outlineStyle={styles.marcoEntradaCodigo}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                </View>
+                {errorInputsCustom && (
+                  <HelperText
+                    style={{
+                      color: "red",
+                      fontFamily: theme.fonts.textBold,
+                      fontSize: 16,
+                      bottom: 100,
+                    }}
+                  >
+                    LLene todos los campos correctamente
+                  </HelperText>
+                )}
+                <ButtonGeneral
+                  icon={
+                    <Icon2
+                      name={"ticket"}
+                      size={40}
+                      type={"entypo"}
+                      color={"white"}
+                      style={{ marginRight: 5 }}
+                    />
+                  }
+                  background={theme.colors.orangeSegunda}
+                  border={8}
+                  size={60}
+                  onPress={() => {
+                    if (
+                      ValuePlata != undefined &&
+                      ValueGolden != undefined &&
+                      CodeText != undefined
+                    ) {
+                      setErrorInputsCustom(false);
+                      generateCodes(ValuePlata, ValueGolden, "PersonalCode");
 
-              <TextInput
-                label="Monedas Oro."
-                value={ValueGolden}
-                onChangeText={setValueGolden}
-                mode="outlined"
-                style={{ width: 200 }}
-                outlineStyle={styles.marcoEntradaCodigo}
-                keyboardType="numeric"
-              />
-              <TextInput
-                label="Monedas Plata."
-                value={ValuePlata}
-                onChangeText={setValuePlata}
-                mode="outlined"
-                style={{ width: 200 }}
-                outlineStyle={styles.marcoEntradaCodigo}
-                keyboardType="numeric"
-              />
-            </View>
-          ) : (
-            <View>
-              <ButtonGeneral
-                icon={
-                  <Icon2
-                    name={"ticket"}
-                    size={80}
-                    type={"entypo"}
-                    color={"white"}
-                    style={{ marginRight: 5 }}
-                  />
-                }
-                background={theme.colors.orangeSegunda}
-                border={8}
-                size={100}
-                onPress={() => {
-                  if (
-                    ValuePlata != undefined &&
-                    ValueGolden != undefined &&
-                    CodeText != undefined
-                  ) {
-                    generateCodes(ValuePlata, ValueGolden, "PersonalCode");
-                    console.log(
-                      "mis codes son--------------------------->",
-                      codesRef.current
-                    );
-                    // saveCodes(codes);
-                    generarPDFyDescargar();
-                    console.log(
-                      "Valor de codigo:",
-                      ValuePlata,
-                      "Valor Gold",
-                      ValueGolden
-                    );
-                    // generateRandomCode()
-                  } else {
-                    console.log(
-                      "No se pudieron generar los codigos de manera correcta"
-                    );
-                  }
-                }}
-                width={200}
-              />
-              <TextGeneral
-                text={"Generar código Personalizado"}
-                color={"white"}
-                size={18}
-                style={[styles.textIn]}
-              />
-              <TextInput
-                label="Genera el codigo"
-                value={CodeText}
-                onChangeText={setCodeText}
-                mode="outlined"
-                style={{ width: 200 }}
-                outlineStyle={styles.marcoEntradaCodigo}
-                keyboardType="numeric"
-              />
-              <TextInput
-                label="Monedas Plata."
-                value={ValuePlata}
-                onChangeText={setValuePlata}
-                mode="outlined"
-                style={{ width: 200 }}
-                outlineStyle={styles.marcoEntradaCodigo}
-                keyboardType="numeric"
-              />
-              <TextInput
-                label="Monedas Oro."
-                value={ValueGolden}
-                onChangeText={setValueGolden}
-                mode="outlined"
-                style={{ width: 200 }}
-                outlineStyle={styles.marcoEntradaCodigo}
-                keyboardType="numeric"
-              />
-            </View>
-          )}
+                      console.log(
+                        "mis codes son--------------------------->",
+                        codesRef.current
+                      );
+                      // saveCodes(codes);
+                      generarPDFyDescargar();
+                      console.log(
+                        "Valor de codigo:",
+                        ValuePlata,
+                        "Valor Gold",
+                        ValueGolden
+                      );
+                      // generateRandomCode()
+                    } else {
+                      console.log(
+                        "No se pudieron generar los codigos de manera correcta"
+                      );
+                      setErrorInputsCustom(true);
+                    }
+                  }}
+                  width={"100%"}
+                />
+              </View>
+            )}
+          </View>
         </View>
       </View>
       <StatusBar style="auto" />
