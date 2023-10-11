@@ -35,13 +35,19 @@ export const updateDinamicDocument = async (id, collectionName, newData) => {
     });
 };
 
-export const createDinamicDocument = (id, collectionName, newData) => {
+export const createDinamicDocument = async (id, collectionName, newData) => {
   // console.log(
   //   "lo que me llega de promotion=?????????????????????????????????",
   //   promotion
   // );
   const documentRef = doc(global.dbCon, collectionName, id);
-  setDoc(documentRef, newData);
+  await setDoc(documentRef, newData)
+    .then(() => {
+      console.log("Documento creado correctamente.");
+    })
+    .catch((error) => {
+      console.error("Error al crear el documento:", error);
+    });
 };
 
 export const createDinamicDocumentWithinId = async (

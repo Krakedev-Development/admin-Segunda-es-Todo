@@ -284,9 +284,10 @@ export const Products = ({ navigation }) => {
         icon="plus"
         style={styles.fab}
         onPress={() => {
-          navigation.navigate("new-trivia", {
+          navigation.navigate("NewProducts", {
             setRefresh: setRefresh,
             refresh: refresh,
+            length: dataDB.length + 1,
           });
         }}
         color="white"

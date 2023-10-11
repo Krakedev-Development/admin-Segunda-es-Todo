@@ -83,7 +83,22 @@ const ModalComponent = ({ visible, onCloseModal, editing, data, loadData }) => {
     return result;
   };
 
+  const generateMarkCode = (length) => {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    let result = "";
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charactersLength);
+      result += characters.charAt(randomIndex);
+    }
+
+    return result;
+  };
+
   const randomId = generateRandomId(8);
+
+  const MarkCode = generateMarkCode(4);
 
   const upLoadImage = async () => {
     setLoad(true);
@@ -114,10 +129,10 @@ const ModalComponent = ({ visible, onCloseModal, editing, data, loadData }) => {
       //console.log("mi filename...........", IDFinal);
 
       await SubirFoto(imageDB, IDFinal, (downloadURL) => {
-         updatePromotionDB(data.promotionId, {
+        updatePromotionDB(data.promotionId, {
           ...docNew,
           ...{ imgUrl: downloadURL },
-        }); 
+        });
         setImageDB(null);
         setName("");
         setDescription("");
@@ -125,19 +140,36 @@ const ModalComponent = ({ visible, onCloseModal, editing, data, loadData }) => {
         setLoad(false);
         onCloseModal();
         loadData();
-      }); 
-      
+      });
     } catch (error) {}
   };
 
   let hasError = false;
 
   const saveData = () => {
-    hasError = (!validaciones(name,setErrorName,description, setErrorDescription, points, setErrorPoints, imageDB, setErrorImage))
-    console.log("name: "+name +" description "+description+" points "+points+" imageDB "+imageDB)
-    console.log("Error: "+hasError)
+    hasError = !validaciones(
+      name,
+      setErrorName,
+      description,
+      setErrorDescription,
+      points,
+      setErrorPoints,
+      imageDB,
+      setErrorImage
+    );
+    console.log(
+      "name: " +
+        name +
+        " description " +
+        description +
+        " points " +
+        points +
+        " imageDB " +
+        imageDB
+    );
+    console.log("Error: " + hasError);
     if (hasError) {
-      console.log("se detiene")
+      console.log("se detiene");
       return;
     }
 
@@ -154,6 +186,7 @@ const ModalComponent = ({ visible, onCloseModal, editing, data, loadData }) => {
     description: description,
     price: points,
     imgUrl: editing ? data?.imgUrl : null,
+    MarketingCode: "SET" + MarkCode,
   };
 
   return (

@@ -42,34 +42,33 @@ import { NotificationsForm } from "./app/screens/Notificaciones/NotificationsFor
 import { NewTrivia } from "./app/screens/Trivia/NewTrivia";
 import { Products } from "./app/screens/Products/Products";
 import { LoginForm } from "./app/screens/LoginScreen/LoginScreen";
+import { NewProducts } from "./app/screens/Products/NewProducts";
 
 const LoginStack = createNativeStackNavigator();
 // const GroupStack = createNativeStackNavigator();
 const TabBar = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const ProductsStack = createNativeStackNavigator();
 const PromotionStack = createNativeStackNavigator();
 const PredictionStack = createNativeStackNavigator();
 const TriviasStack = createNativeStackNavigator();
 const NotificationsStack = createNativeStackNavigator();
 
+const ProductsNav = () => {
+  return (
+    <ProductsStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProductsStack.Screen name="Products" component={Products} />
+      <ProductsStack.Screen name="NewProducts" component={NewProducts} />
+    </ProductsStack.Navigator>
+  );
+};
+
 const TriviasNav = () => {
   return (
-    <TriviasStack.Navigator>
-      <TriviasStack.Screen
-        name="Principal"
-        component={Trivia}
-        options={{ headerShown: false }}
-      />
-      <TriviasStack.Screen
-        name="triviaDetails"
-        component={TriviaDetails}
-        options={{ headerShown: false }}
-      />
-      <TriviasStack.Screen
-        name="new-trivia"
-        component={NewTrivia}
-        options={{ headerShown: false }}
-      />
+    <TriviasStack.Navigator screenOptions={{ headerShown: false }}>
+      <TriviasStack.Screen name="Principal" component={Trivia} />
+      <TriviasStack.Screen name="triviaDetails" component={TriviaDetails} />
+      <TriviasStack.Screen name="new-trivia" component={NewTrivia} />
     </TriviasStack.Navigator>
   );
 };
@@ -310,7 +309,7 @@ const BarNavigator = () => {
       />
       <TabBar.Screen
         name="Productos"
-        component={Products}
+        component={ProductsNav}
         options={{
           headerShown: false,
           title: "Productos",
