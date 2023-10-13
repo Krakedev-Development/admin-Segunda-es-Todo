@@ -32,6 +32,7 @@ export const NewProducts = ({ navigation, route }) => {
     silverRatio: null,
     category: { categoryId: "001", name: "dish" },
     image: null,
+    active:true,
   });
 
   const filters = ["Platos", "Bebidas", "Regalos"];
