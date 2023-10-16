@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Icon } from "@rneui/base";
 import { StatusBar } from "expo-status-bar";
 //Import de screens
-import { RedeemCode } from "./app/screens/ScreenNav/RedeemCodes";
+import { RedeemCode, RedeemCodes } from "./app/screens/ScreenNav/RedeemCodes";
 import { Coments } from "./app/screens/ScreenNav/Coments";
 import theme from "./app/theme/theme";
 import { ListGroups } from "./app/screens/ScreenNav/Groups/ListGroups";
@@ -237,7 +237,7 @@ const BarNavigator = () => {
       />
       <TabBar.Screen
         name="Codigos"
-        component={RedeemCode}
+        component={RedeemCodes}
         options={{
           headerShown: false,
           title: "Códigos",

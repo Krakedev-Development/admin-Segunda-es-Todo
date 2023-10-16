@@ -1,571 +1,210 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import theme from "../../theme/theme";
-import logos from "../../theme/logos";
-import { ButtonGeneral } from "../../Components/GeneralComponents/ButtonGeneral";
-import { TextGeneral } from "../../Components/GeneralComponents/TextGeneral";
-import Icon from "react-native-vector-icons/Ionicons";
-import Icon2 from "react-native-vector-icons/Entypo";
-import User from "react-native-vector-icons/FontAwesome";
-import { collection, addDoc, doc, setDoc } from "firebase/firestore";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+  PermissionsAndroid,
+} from "react-native";
+import React, { useState, useRef } from "react";
+import QRCode from "react-native-qrcode-svg";
+import ViewShot from "react-native-view-shot";
 import RNFS from "react-native-fs";
-import RNHTMLtoPDF from "react-native-html-to-pdf";
-import Share from "react-native-share";
-import { StatusBar } from "expo-status-bar";
-import { useContext, useRef, useState } from "react";
-import { cerrarSesion } from "../../Services/AutenticacionSrv";
-import { getAuth } from "firebase/auth";
-import { SessionContext } from "../../context/SessionContext";
-import { LoadGeneral } from "../../Components/GeneralComponents/LoadGeneral";
-import { HelperText, TextInput } from "react-native-paper";
+import { Button, TextInput } from "react-native-paper";
+import {
+  createDinamicDocumentWithinId,
+  updateDinamicDocument,
+} from "../../Services/firebase";
+import theme from "../../theme/theme";
 import StyledText from "../../theme/StyledText";
-import QRCode from 'react-native-qrcode-svg';
-// import PDFLib from "react-native-pdf-lib";
-export const RedeemCode = () => {
-  const [codes, setCodes] = useState([]);
-  const auth = getAuth();
-  const { user } = useContext(SessionContext);
-  const codesRef = useRef([]);
-  const [load, setLoad] = useState(false);
-  const [ValueGolden, setValueGolden] = useState();
-  const [ValuePlata, setValuePlata] = useState();
-  const [CodigosGenerales, setCodigosGenerales] = useState(false);
-  const [CodeText, setCodeText] = useState("");
-  const [errorInputsGeneral, setErrorInputsGeneral] = useState(false);
-  const [errorInputsCustom, setErrorInputsCustom] = useState(false);
-  const [valueCode, setValueCode] = useState(null)
-  const [generate, setGenerate] = useState(false)
-  let base64Logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAA..';
+import { TouchableOpacity } from "react-native";
+import Constants from "expo-constants";
 
-  const generateRandomCode = () => {
-    let code = "";
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const codeLength = 5; // Longitud del código generado (puedes ajustarlo según tus necesidades)
+export const RedeemCodes = () => {
+  const [money, setMoney] = useState("5");
+  const [attempts, setAttempts] = useState("5");
+  const [qrCode, setQrCode] = useState(null);
+  const [specialCode, setSpecialCode] = useState(false);
+  const [generateCode, setGenerateCode] = useState(false);
+  const qrCodeRef = useRef(null);
+  const viewShotRef = useRef(null);
 
-    for (let i = 0; i < codeLength; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      code += characters.charAt(randomIndex);
+  const handleDownloadQRCode = async () => {
+    setGenerateCode(true);
+    let codeQR = {
+      state: true,
+      money: money,
+    };
+    if (specialCode && attempts) {
+      codeQR.attempts = attempts;
     }
-    console.log("code generade:::::", code);
-    return code;
-  };
-  const generateCodes = (ValuePlata, ValueGolden, Type) => {
-    const codes = [];
-
-    if (Type === "GeneralCode") {
-      for (let i = 0; i < 10; i++) {
-        codes.push({
-          code: generateRandomCode(),
-          status: true,
-          value: {
-            goldCoins: parseInt(ValueGolden),
-            silverCoins: parseInt(ValuePlata),
-          },
-          Type: Type,
-        });
-      }
-      setCodes(codes);
-      codesRef.current = codes;
-      // console.log("codes::::::::::::::::::", codes);
-      return codes;
-    }
-    if (Type === "PersonalCode") {
-      for (let i = 0; i < 10; i++) {
-        codes.push({
-          code: CodeText,
-          status: true,
-          value: {
-            goldCoins: parseInt(ValueGolden),
-            silverCoins: parseInt(ValuePlata),
-          },
-          Type: Type,
-        });
-      }
-      setCodes(codes);
-      codesRef.current = codes;
-      // console.log("codes::::::::::::::::::", codes);
-      return codes;
-    } else {
-    }
-  };
-
-  const saveCodes = (codes) => {
-    console.log(global.dbCon);
-    const clienteRef = collection(global.dbCon, "codes");
-
-    for (const code of codes) {
-      const newCodeDocRef = doc(clienteRef, code.code); // Utiliza el código como ID del documento
-      setDoc(newCodeDocRef, code);
-    }
-    // console.log("generateCodes", generateCodes());
-    // addDoc(clienteRef, { codes: codes });
-  };
-
-  const generarNombreArchivoUnico = () => {
-    const fechaActual = new Date();
-    const anio = fechaActual.getFullYear();
-    const mes = fechaActual.getMonth() + 1;
-    const dia = fechaActual.getDate();
-    const hora = fechaActual.getHours();
-    const nombreArchivoConGuion = `${anio}-${mes
-      .toString()
-      .padStart(2, "0")}-${dia.toString().padStart(2, "0")}-${hora}`;
-    const nombreArchivo = `codigos_${nombreArchivoConGuion}`;
-    return nombreArchivo;
-    // return Platform.OS === "ios"
-    //   ? `${RNFS.TemporaryDirectoryPath}/${nombreArchivo}`
-    //   : `${RNFS.ExternalDirectoryPath}/${nombreArchivo}`;
-  };
-
-  const generarPDFyDescargar = async () => {
-    // setLoad(true);
+    console.log("ASI SE VA A LA BASE: ", codeQR);
+    let firebaseCode = await createDinamicDocumentWithinId("codes", codeQR);
+    console.log("ESTO RECUPERO DE FIREBASE: ", firebaseCode);
+    setQrCode(firebaseCode);
     try {
-      const halfLength = Math.ceil(codesRef.current.length / 2);
-      const leftColumn = codesRef.current.slice(0, halfLength);
-      const rightColumn = codesRef.current.slice(halfLength);
-      saveCodes(codesRef.current);
-      // Crea el; contenido HTML con los códigos en dos columnas dentro de una tabla
-      const htmlContent = `
-        <html>
-          <body>
-            <h1>Códigos de muestra</h1>
-            <table style="width: 100%; border-collapse: collapse">
-              <tbody>
-                <tr>
-                  <td style="width: 50%;">
-                    ${leftColumn
-          .map(
-            (codigo) => `
-                      <p style="border: 1px dashed black; margin: 0; padding: 5px;">Canjea puntos:  ${codigo.code} 😎🍻  ${codigo.value}</p>
-                    `
-          )
-          .join("")}
-                  </td>
-                  <td style="width: 50%;">
-                    ${rightColumn
-          .map(
-            (codigo) => `
-                      <p style="border: 1px dashed black; margin: 0; padding: 5px;">Canjea puntos: ${codigo.code} 😎🍻  ${codigo.value}</p>
-                    `
-          )
-          .join("")}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </body>
-        </html>
-      `;
-
-     
-      // Configura las opciones para el PDF
-      const options = {
-        html: htmlContent,
-        fileName: generarNombreArchivoUnico(),
-        directory: "Documents",
-        height: 842, // Tamaño de página A4 (tamaño predeterminado)
-        width: 595,
-      };
-
-      // Genera el PDF
-      const pdf = await RNHTMLtoPDF.convert(options);
-
-      // Obtiene la ruta del PDF generado
-      const pdfPath = pdf.filePath;
-
-      console.log("PDF generado:", pdfPath);
-
-      await Share.open({
-        url: `file://${pdfPath}`,
-        type: "application/pdf",
-        failOnCancel: false,
+      if (Platform.OS === "android") {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          alert("Permisos denegados");
+        }
+      }
+      await viewShotRef.current.capture().then(async (uri) => {
+        const path =
+          RNFS.PicturesDirectoryPath + "/" + firebaseCode.id + ".png";
+        await RNFS.moveFile(uri, path);
+        await RNFS.scanFile(path);
+        alert("El QR ha sido guardado exitosamente.");
       });
-      const nombreArchivo = generarNombreArchivoUnico();
-      await RNFS.moveFile(pdfPath, nombreArchivo);
-
-      console.log("PDF movido a:", nombreArchivo);
+      setGenerateCode(false);
     } catch (error) {
-      console.error("Error al generar y mover el PDF:", error);
+      setGenerateCode(false);
+      console.log("ERROR: ", error);
     }
-    // setLoad(false);
   };
-  let codeQr = {
-    state: true,
-    money: 200,
-    id: 12
-  }
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { marginTop: Constants.statusBarHeight }]}>
       <View
         style={{
-          backgroundColor: "black",
-          height: 50,
-          justifyContent: "space-between",
-          alignItems: "center",
+          borderWidth: 0.2,
+          borderColor: "white",
+          borderRadius: 50,
           flexDirection: "row",
-          paddingHorizontal: 8,
-        }}
-      >
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <User
-            name={"user"}
-            size={25}
-            type={"entypo"}
-            color={"white"}
-            style={{ marginRight: 15 }}
-          />
-          <View style={{ flexDirection: "column" }}>
-            <Text style={{ color: "white" }}>
-              Bienvenido {user?.name ? user.name : "Usuario"} {user?.lastName}
-            </Text>
-            <Text style={{ color: "white" }}>{auth?.currentUser?.email}</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity
-          onPress={() => cerrarSesion()}
-          style={{ flexDirection: "row", alignItems: "center" }}
-        >
-          <Text style={{ color: "white", marginRight: 5 }}>Salir</Text>
-          <Icon name={"exit"} size={25} type={"entypo"} color={"white"} />
-        </TouchableOpacity>
-      </View>
-      <View
-        style={{
-          backgroundColor: "black",
-          flex: 5,
-          justifyContent: "center",
+          justifyContent: "space-evenly",
           alignItems: "center",
+          padding: 5,
+          width: "90%",
         }}
       >
-        <Image source={logos.blanco} style={{ width: 180, height: 160 }} />
-      </View>
-      <View style={{ backgroundColor: "black", flex: 10 }}>
-        <View style={{ flex: 1 }}>
-          <TextInput
-            label="Valor del Código"
-            value={valueCode}
-            onChangeText={setValueCode}
-            mode="outlined"
-            style={{ width: "95%" }}
-            outlineStyle={styles.marcoEntradaCodigo}
-            keyboardType="numeric"
-          //error={!ValueGolden ? true : false}
-          />
-        </View>
-        <View style={{ flex: 3, justifyContent: 'center', alignItems: 'center' }}>
-          {
-            generate && valueCode ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <QRCode
-                value={JSON.stringify(codeQr)}
-                logo={{ uri: base64Logo }}
-                //logoSize={100}
-                size={300}
-                logoBackgroundColor='transparent'
-              />
-              <TouchableOpacity style={{ padding: 15, marginVertical: 10, backgroundColor: theme.colors.orangeSegunda, borderRadius: 10, width: '50%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setGenerate(true)}><StyledText color={"white"}>Generar nuevamente</StyledText></TouchableOpacity>
-            </View> : <TouchableOpacity style={{ padding: 15, backgroundColor: theme.colors.orangeSegunda, borderRadius: 10, width: '50%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setGenerate(true)}><StyledText color={"white"}>Generar Código</StyledText></TouchableOpacity>
-          }
-
-        </View>
-
-        {/* <View
+        <TouchableOpacity
+          onPress={() => setSpecialCode(false)}
           style={{
-            backgroundColor: theme.colors.blackSegunda,
-            height: "100%",
-            borderTopLeftRadius: 20,
-            borderTopEndRadius: 20,
-            alignItems: "center",
+            backgroundColor: specialCode
+              ? theme.colors.blackSegunda
+              : theme.colors.orangeSegunda,
+            padding: 10,
+            //paddingHorizontal: 20,
             justifyContent: "center",
-            padding: 20,
+            alignItems: "center",
+            margin: 5,
+            flex: 1,
+            borderRadius: 25,
           }}
         >
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-around",
-              //paddingHorizontal: 20,
-              width: "100%",
-              //backgroundColor: "red",
-              //marginVertical: 20,
-              //marginTop: 20,
-            }}
+          <StyledText
+            style={{ color: "white", fontFamily: theme.fonts.textBold }}
           >
-            <TouchableOpacity
-              style={{
-                backgroundColor: CodigosGenerales
-                  ? theme.colors.orangeSegunda
-                  : theme.colors.grey,
-                padding: 10,
-                borderRadius: 5,
-              }}
-              onPress={() => setCodigosGenerales(true)}
+            Código personal
+          </StyledText>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setSpecialCode(true)}
+          style={{
+            backgroundColor: specialCode
+              ? theme.colors.orangeSegunda
+              : theme.colors.blackSegunda,
+            padding: 10,
+            flex: 1,
+            margin: 5,
+            borderRadius: 25,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <StyledText
+            style={{ color: "white", fontFamily: theme.fonts.textBold }}
+          >
+            Código promocional
+          </StyledText>
+        </TouchableOpacity>
+      </View>
+      <TextInput
+        style={{ width: "90%", marginVertical: 10 }}
+        onChangeText={(txt) => setMoney(parseInt(txt))}
+        value={money ? money.toString() : null}
+        label={"Número de monedas"}
+        keyboardType="numeric"
+        mode="outlined"
+      />
+      {specialCode && (
+        <TextInput
+          style={{ width: "90%", marginBottom: 15 }}
+          onChangeText={(txt) => setAttempts(parseInt(txt))}
+          value={attempts ? attempts.toString() : null}
+          keyboardType="numeric"
+          label={"Intentos de reclamo"}
+          mode="outlined"
+        />
+      )}
+      <Button
+        onPress={handleDownloadQRCode}
+        loading={generateCode}
+        style={{
+          backgroundColor: theme.colors.orangeSegunda,
+          borderRadius: 5,
+          //flex: 1,
+          width: "90%",
+        }}
+      >
+        <StyledText
+          style={{ fontFamily: theme.fonts.textBold, color: "white" }}
+        >
+          {generateCode ? "Generando" : "Crear QR"}
+        </StyledText>
+      </Button>
+      {qrCode && (
+        <View style={{ marginTop: 30 }}>
+          <View style={{ marginVertical: 20 }}>
+            <View
+              style={{ width: "100%", alignItems: "center", marginBottom: 10 }}
             >
               <StyledText
-                style={{
-                  //marginHorizontal: 30,
-                  //textDecorationLine: "underline",
-                  color: "white",
-                }}
+                style={{ color: "white", fontFamily: theme.fonts.textBold }}
               >
-                Codigos Generales
+                DATOS DEL QR
               </StyledText>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: CodigosGenerales
-                  ? theme.colors.grey
-                  : theme.colors.orangeSegunda,
-                padding: 10,
-                borderRadius: 5,
-              }}
-              onPress={() => setCodigosGenerales(false)}
+            </View>
+            <StyledText
+              style={{ color: "white", fontFamily: theme.fonts.textBold }}
             >
+              ID: {qrCode?.id}
+            </StyledText>
+            <StyledText
+              style={{ color: "white", fontFamily: theme.fonts.textBold }}
+            >
+              MONEDAS: {qrCode?.money}
+            </StyledText>
+            {qrCode?.attempts && (
               <StyledText
-                style={{
-                  //marginHorizontal: 30,
-                  //textDecorationLine: "underline",
-                  color: "white",
-                }}
+                style={{ color: "white", fontFamily: theme.fonts.textBold }}
               >
-                Codigos Personalizados
+                INTENTOS: {qrCode?.attempts}
               </StyledText>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              flex: 10,
-              //backgroundColor: "green",
-              width: "100%",
-              alignItems: "flex-start",
-              padding: 10,
-            }}
-          >
-            {CodigosGenerales ? (
-              <View
-                style={
-                  {
-                    //flex: 10,
-                    //backgroundColor: "green",
-                    //width: "100%",
-                    //alignItems: "center",
-                    //padding: 10,
-                  }
-                }
-              >
-                <TextGeneral
-                  text={"Código General"}
-                  color={"white"}
-                  size={18}
-                  style={[styles.textIn]}
-                />
-                <View style={{ flexDirection: "row", flex: 1, width: "100%" }}>
-                  <View style={{ flex: 1 }}>
-                    <TextInput
-                      label="Monedas Oro."
-                      value={ValueGolden}
-                      onChangeText={setValueGolden}
-                      mode="outlined"
-                      style={{ width: "95%" }}
-                      outlineStyle={styles.marcoEntradaCodigo}
-                      keyboardType="numeric"
-                    //error={!ValueGolden ? true : false}
-                    />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <TextInput
-                      label="Monedas Plata."
-                      value={ValuePlata}
-                      onChangeText={setValuePlata}
-                      mode="outlined"
-                      style={{ width: "95%" }}
-                      outlineStyle={styles.marcoEntradaCodigo}
-                      keyboardType="numeric"
-                    />
-                  </View>
-                </View>
-                {errorInputsGeneral && (
-                  <HelperText
-                    style={{
-                      color: "red",
-                      fontFamily: theme.fonts.textBold,
-                      fontSize: 16,
-                      bottom: 180,
-                    }}
-                  >
-                    LLene todos los campos correctamente
-                  </HelperText>
-                )}
-                <ButtonGeneral
-                  icon={
-                    <Icon2
-                      name={"ticket"}
-                      size={45}
-                      type={"entypo"}
-                      color={"white"}
-                      style={{ marginRight: 5 }}
-                    />
-                  }
-                  background={theme.colors.orangeSegunda}
-                  border={8}
-                  size={60}
-                  onPress={() => {
-                    if (
-                      ValuePlata != undefined ||
-                      (ValuePlata != null && ValueGolden != undefined) ||
-                      ValueGolden != null
-                    ) {
-                      setErrorInputsGeneral(false);
-                      generateCodes(ValuePlata, ValueGolden, "GeneralCode");
-                      console.log(
-                        "mis codes son--------------------------->",
-                        codesRef.current
-                      );
-                      // saveCodes(codes);
-                      generarPDFyDescargar();
-                      console.log(
-                        "Valor de codigo:",
-                        ValuePlata,
-                        "Valor GOLd",
-                        ValueGolden
-                      );
-                      // generateRandomCode()
-                    } else {
-                      console.log(
-                        "No se puedieron generar los codigos de manera correcta"
-                      );
-                      setErrorInputsGeneral(true);
-                    }
-                  }}
-                  width={"100%"}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  //backgroundColor: "red",
-                  width: "100%",
-                  height: "100%",
-                  flex: 1,
-                }}
-              >
-                <TextGeneral
-                  text={"Generar código Personalizado"}
-                  color={"white"}
-                  size={18}
-                  style={[styles.textIn]}
-                />
-                <TextInput
-                  label="Genera el codigo"
-                  value={CodeText}
-                  onChangeText={setCodeText}
-                  mode="outlined"
-                  style={{ width: 200 }}
-                  outlineStyle={styles.marcoEntradaCodigo}
-                  keyboardType="numeric"
-                />
-                <View style={{ flexDirection: "row", flex: 1, width: "100%" }}>
-                  <View style={{ flex: 1 }}>
-                    <TextInput
-                      label="Monedas Plata."
-                      value={ValuePlata}
-                      onChangeText={setValuePlata}
-                      mode="outlined"
-                      style={{ width: "95%" }}
-                      outlineStyle={styles.marcoEntradaCodigo}
-                      keyboardType="numeric"
-                    />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <TextInput
-                      label="Monedas Oro."
-                      value={ValueGolden}
-                      onChangeText={setValueGolden}
-                      mode="outlined"
-                      style={{ width: "95%" }}
-                      outlineStyle={styles.marcoEntradaCodigo}
-                      keyboardType="numeric"
-                    />
-                  </View>
-                </View>
-                {errorInputsCustom && (
-                  <HelperText
-                    style={{
-                      color: "red",
-                      fontFamily: theme.fonts.textBold,
-                      fontSize: 16,
-                      bottom: 100,
-                    }}
-                  >
-                    LLene todos los campos correctamente
-                  </HelperText>
-                )}
-                <ButtonGeneral
-                  icon={
-                    <Icon2
-                      name={"ticket"}
-                      size={40}
-                      type={"entypo"}
-                      color={"white"}
-                      style={{ marginRight: 5 }}
-                    />
-                  }
-                  background={theme.colors.orangeSegunda}
-                  border={8}
-                  size={60}
-                  onPress={() => {
-                    if (
-                      ValuePlata != undefined &&
-                      ValueGolden != undefined &&
-                      CodeText != undefined
-                    ) {
-                      setErrorInputsCustom(false);
-                      generateCodes(ValuePlata, ValueGolden, "PersonalCode");
-
-                      console.log(
-                        "mis codes son--------------------------->",
-                        codesRef.current
-                      );
-                      // saveCodes(codes);
-                      generarPDFyDescargar();
-                      console.log(
-                        "Valor de codigo:",
-                        ValuePlata,
-                        "Valor Gold",
-                        ValueGolden
-                      );
-                      // generateRandomCode()
-                    } else {
-                      console.log(
-                        "No se pudieron generar los codigos de manera correcta"
-                      );
-                      setErrorInputsCustom(true);
-                    }
-                  }}
-                  width={"100%"}
-                />
-              </View>
             )}
           </View>
-        </View> */}
-      </View>
-      <StatusBar style="auto" />
+          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0 }}>
+            <QRCode
+              ref={qrCodeRef}
+              value={JSON.stringify(qrCode)}
+              size={300}
+              color="black"
+              backgroundColor="white"
+            />
+          </ViewShot>
+        </View>
+      )}
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 25,
     flex: 1,
-    backgroundColor: "black",
-    flexDirection: "column",
-    // paddingHorizontal: theme.separation.horizontalSeparation,
-    justifyContent: "flex-start",
-  },
-  textIn: {
-    marginBottom: 15,
-    marginTop: 10,
+    //justifyContent: "center",
+    backgroundColor: theme.colors.blackSegunda,
+    paddingVertical: 30,
+    alignItems: "center",
   },
 });

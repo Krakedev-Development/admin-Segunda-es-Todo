@@ -182,8 +182,13 @@ export const Reedem = () => {
                       : "a"}
                   </Text>
                   <Text style={{ color: "white" }}>
-                    {orderClient?.totalAmount ? orderClient?.totalAmount : "2 "}{" "}
-                    monedas
+                    {orderClient?.totalAmount?.goldCoins &&
+                    orderClient?.totalAmount?.silverCoins
+                      ? "M.Oro: " +
+                        orderClient?.totalAmount?.goldCoins +
+                        " M.Plata: " +
+                        orderClient?.totalAmount?.silverCoins
+                      : "2 "}{" "}
                   </Text>
                 </View>
                 <View

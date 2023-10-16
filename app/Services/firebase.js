@@ -63,6 +63,9 @@ export const createDinamicDocumentWithinId = async (
     newData
   );
   console.log("Document written with ID: ", docRef.id);
+  await updateDoc(docRef, { id: docRef.id });
+  newData.id = docRef.id;
+  return newData;
 };
 
 export const deleteDocument = (id, collectionName) => {
