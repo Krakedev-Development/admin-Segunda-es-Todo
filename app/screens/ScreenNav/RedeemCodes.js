@@ -36,6 +36,7 @@ export const RedeemCodes = () => {
     };
     if (specialCode && attempts) {
       codeQR.attempts = attempts;
+      codeQR.idClaimed = [];
     }
     console.log("ASI SE VA A LA BASE: ", codeQR);
     let firebaseCode = await createDinamicDocumentWithinId("codes", codeQR);
