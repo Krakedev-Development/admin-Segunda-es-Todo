@@ -18,6 +18,7 @@ import { SessionContext } from "../../context/SessionContext";
 import { LoadGeneral } from "../../Components/GeneralComponents/LoadGeneral";
 import { HelperText, TextInput } from "react-native-paper";
 import StyledText from "../../theme/StyledText";
+import QRCode from 'react-native-qrcode-svg';
 // import PDFLib from "react-native-pdf-lib";
 export const RedeemCode = () => {
   const [codes, setCodes] = useState([]);
@@ -31,6 +32,9 @@ export const RedeemCode = () => {
   const [CodeText, setCodeText] = useState("");
   const [errorInputsGeneral, setErrorInputsGeneral] = useState(false);
   const [errorInputsCustom, setErrorInputsCustom] = useState(false);
+  const [valueCode, setValueCode] = useState(null)
+  const [generate, setGenerate] = useState(false)
+  let base64Logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAA..';
 
   const generateRandomCode = () => {
     let code = "";
@@ -130,21 +134,21 @@ export const RedeemCode = () => {
                 <tr>
                   <td style="width: 50%;">
                     ${leftColumn
-                      .map(
-                        (codigo) => `
+          .map(
+            (codigo) => `
                       <p style="border: 1px dashed black; margin: 0; padding: 5px;">Canjea puntos:  ${codigo.code} 😎🍻  ${codigo.value}</p>
                     `
-                      )
-                      .join("")}
+          )
+          .join("")}
                   </td>
                   <td style="width: 50%;">
                     ${rightColumn
-                      .map(
-                        (codigo) => `
+          .map(
+            (codigo) => `
                       <p style="border: 1px dashed black; margin: 0; padding: 5px;">Canjea puntos: ${codigo.code} 😎🍻  ${codigo.value}</p>
                     `
-                      )
-                      .join("")}
+          )
+          .join("")}
                   </td>
                 </tr>
               </tbody>
@@ -153,6 +157,7 @@ export const RedeemCode = () => {
         </html>
       `;
 
+     
       // Configura las opciones para el PDF
       const options = {
         html: htmlContent,
@@ -184,6 +189,11 @@ export const RedeemCode = () => {
     }
     // setLoad(false);
   };
+  let codeQr = {
+    state: true,
+    money: 200,
+    id: 12
+  }
   return (
     <View style={styles.container}>
       <View
@@ -231,7 +241,35 @@ export const RedeemCode = () => {
         <Image source={logos.blanco} style={{ width: 180, height: 160 }} />
       </View>
       <View style={{ backgroundColor: "black", flex: 10 }}>
-        <View
+        <View style={{ flex: 1 }}>
+          <TextInput
+            label="Valor del Código"
+            value={valueCode}
+            onChangeText={setValueCode}
+            mode="outlined"
+            style={{ width: "95%" }}
+            outlineStyle={styles.marcoEntradaCodigo}
+            keyboardType="numeric"
+          //error={!ValueGolden ? true : false}
+          />
+        </View>
+        <View style={{ flex: 3, justifyContent: 'center', alignItems: 'center' }}>
+          {
+            generate && valueCode ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <QRCode
+                value={JSON.stringify(codeQr)}
+                logo={{ uri: base64Logo }}
+                //logoSize={100}
+                size={300}
+                logoBackgroundColor='transparent'
+              />
+              <TouchableOpacity style={{ padding: 15, marginVertical: 10, backgroundColor: theme.colors.orangeSegunda, borderRadius: 10, width: '50%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setGenerate(true)}><StyledText color={"white"}>Generar nuevamente</StyledText></TouchableOpacity>
+            </View> : <TouchableOpacity style={{ padding: 15, backgroundColor: theme.colors.orangeSegunda, borderRadius: 10, width: '50%', justifyContent: 'center', alignItems: 'center' }} onPress={() => setGenerate(true)}><StyledText color={"white"}>Generar Código</StyledText></TouchableOpacity>
+          }
+
+        </View>
+
+        {/* <View
           style={{
             backgroundColor: theme.colors.blackSegunda,
             height: "100%",
@@ -333,7 +371,7 @@ export const RedeemCode = () => {
                       style={{ width: "95%" }}
                       outlineStyle={styles.marcoEntradaCodigo}
                       keyboardType="numeric"
-                      //error={!ValueGolden ? true : false}
+                    //error={!ValueGolden ? true : false}
                     />
                   </View>
                   <View style={{ flex: 1 }}>
@@ -511,7 +549,7 @@ export const RedeemCode = () => {
               </View>
             )}
           </View>
-        </View>
+        </View> */}
       </View>
       <StatusBar style="auto" />
     </View>
