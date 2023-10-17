@@ -20,7 +20,8 @@ import { TouchableOpacity } from "react-native";
 import Constants from "expo-constants";
 
 export const RedeemCodes = () => {
-  const [money, setMoney] = useState("5");
+  const [gold, setGold] = useState("5");
+  const [silver, setSilver] = useState("5");
   const [attempts, setAttempts] = useState("5");
   const [qrCode, setQrCode] = useState(null);
   const [specialCode, setSpecialCode] = useState(false);
@@ -32,7 +33,10 @@ export const RedeemCodes = () => {
     setGenerateCode(true);
     let codeQR = {
       state: true,
-      money: money,
+      money: {
+        gold: gold ? parseInt(gold) : 0,
+        silver: silver ? parseInt(silver) : 0,
+      },
     };
     if (specialCode && attempts) {
       codeQR.attempts = attempts;
@@ -121,14 +125,24 @@ export const RedeemCodes = () => {
           </StyledText>
         </TouchableOpacity>
       </View>
-      <TextInput
-        style={{ width: "90%", marginVertical: 10 }}
-        onChangeText={(txt) => setMoney(parseInt(txt))}
-        value={money ? money.toString() : null}
-        label={"Número de monedas"}
-        keyboardType="numeric"
-        mode="outlined"
-      />
+      <View style={{ flexDirection: "row", width: "90%" }}>
+        <TextInput
+          style={{ width: "48%", marginVertical: 10, marginRight: 10 }}
+          onChangeText={(txt) => setGold(txt)}
+          value={gold}
+          label={"Monedas de oro"}
+          keyboardType="numeric"
+          mode="outlined"
+        />
+        <TextInput
+          style={{ width: "50%", marginVertical: 10 }}
+          onChangeText={(txt) => setSilver(txt)}
+          value={silver}
+          label={"Monedas de plata"}
+          keyboardType="numeric"
+          mode="outlined"
+        />
+      </View>
       {specialCode && (
         <TextInput
           style={{ width: "90%", marginBottom: 15 }}
@@ -175,7 +189,12 @@ export const RedeemCodes = () => {
             <StyledText
               style={{ color: "white", fontFamily: theme.fonts.textBold }}
             >
-              MONEDAS: {qrCode?.money}
+              MONEDAS DE ORO: {qrCode?.money?.gold}
+            </StyledText>
+            <StyledText
+              style={{ color: "white", fontFamily: theme.fonts.textBold }}
+            >
+              MONEDAS DE PLATA: {qrCode?.money?.silver}
             </StyledText>
             {qrCode?.attempts && (
               <StyledText
