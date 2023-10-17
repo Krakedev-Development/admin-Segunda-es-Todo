@@ -17,7 +17,10 @@ import ModalComponent from "../../Components/Promotions/ModalPromotion";
 import { Tarjeta } from "../../Components/Promotions/CardPromotion";
 import { fetchPromotions } from "../../Services/PromotionSrv";
 import { LoadGeneral } from "../../Components/GeneralComponents/LoadGeneral";
-import { fetchDinamicData, updateDinamicDocument } from "../../Services/firebase";
+import {
+  fetchDinamicData,
+  updateDinamicDocument,
+} from "../../Services/firebase";
 import { Card } from "../../Components/Predictions/Card";
 import StyledText from "../../theme/StyledText";
 import ModalEdit from "../../Components/Products/ModalEdit";
@@ -72,15 +75,15 @@ export const Products = ({ navigation }) => {
     return (
       <TouchableOpacity
         onPress={() =>
-        // navigation.navigate("triviaDetails", {
-        //   trivia: item,
-        //   setRefresh: setRefresh,
-        //   refresh: refresh,
-        // })
-        {
-          setItem(item);
-          handleInteractiveModal();
-        }
+          // navigation.navigate("triviaDetails", {
+          //   trivia: item,
+          //   setRefresh: setRefresh,
+          //   refresh: refresh,
+          // })
+          {
+            setItem(item);
+            handleInteractiveModal();
+          }
         }
         style={{
           flex: 1,
@@ -104,21 +107,58 @@ export const Products = ({ navigation }) => {
         </View>
 
         <View style={{ flex: 2 }}>
-          <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ flex: 1, flexDirection: "row" }}>
             <StyledText
-              style={{ fontSize: 20, flex: 2, fontWeight: "bold", }}
+              style={{ fontSize: 20, flex: 2, fontWeight: "bold" }}
               color={"white"}
             >
               {item.name}
             </StyledText>
-            {
-              item?.active ? <TouchableOpacity onPress={() => { updateDinamicDocument(item.id, "products", { active: false }), setRefresh(!refresh) }} style={{ padding: 5, paddingHorizontal: 10, backgroundColor: theme.colors.redSegunda, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }}>
-                <Icon name="trash" type="font-awesome" size={22} color={"white"} />
-              </TouchableOpacity> : <TouchableOpacity onPress={() => {updateDinamicDocument(item.id, "products", { active: true }), setRefresh(!refresh)}} style={{ padding: 5, paddingHorizontal: 10, backgroundColor: "green", borderRadius: 5, justifyContent: 'center', alignItems: 'center' }}>
-                <Icon name="retweet" type="ant-design" size={22} color={"white"} />
+            {item?.active ? (
+              <TouchableOpacity
+                onPress={() => {
+                  updateDinamicDocument(item.id, "products", { active: false }),
+                    setRefresh(!refresh);
+                }}
+                style={{
+                  padding: 5,
+                  paddingHorizontal: 10,
+                  backgroundColor: theme.colors.redSegunda,
+                  borderRadius: 5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Icon
+                  name="trash"
+                  type="font-awesome"
+                  size={22}
+                  color={"white"}
+                />
               </TouchableOpacity>
-            }
-
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  updateDinamicDocument(item.id, "products", { active: true }),
+                    setRefresh(!refresh);
+                }}
+                style={{
+                  padding: 5,
+                  paddingHorizontal: 10,
+                  backgroundColor: "green",
+                  borderRadius: 5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Icon
+                  name="retweet"
+                  type="ant-design"
+                  size={22}
+                  color={"white"}
+                />
+              </TouchableOpacity>
+            )}
           </View>
 
           <StyledText
@@ -127,7 +167,7 @@ export const Products = ({ navigation }) => {
           >
             {item.description}
           </StyledText>
-          {item.stock && (
+          {/* {item?.stock && (
             <StyledText
               color={"white"}
               style={{
@@ -137,9 +177,9 @@ export const Products = ({ navigation }) => {
                 justifyContent: "center",
               }}
             >
-              Stock: {item.stock}{" "}
+              Stock: {item?.stock}{" "}
             </StyledText>
-          )}
+          )} */}
           <View>
             <StyledText
               color={"white"}
