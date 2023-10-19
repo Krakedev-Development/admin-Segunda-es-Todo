@@ -214,22 +214,22 @@ export const NotificationsForm = () => {
               }
               for (const user of users) {
                 console.log("NOTIS DEL USUARIO: ", user?.notifications);
-                if (user?.notifications || user?.notifications?.length > 0) {
-                  let updateNotifications = [
-                    ...user?.notifications,
-                    {
-                      title: notificationsForm.title,
-                      description: notificationsForm.description,
-                      isNew: true,
-                      date: new Date(),
-                      image: imageUrl
-                        ? imageUrl
-                        : "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.facebook.com%2Fsegundaestodo.uio%2F&psig=AOvVaw3FArqnlOB59sZkSODDCzpL&ust=1696361278005000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPiN3K6M2IEDFQAAAAAdAAAAABAD",
-                    },
-                  ];
+                if (user?.notifications) {
+                  let updateNotifications = [...user.notifications];
+                  updateNotifications.push({
+                    title: notificationsForm.title,
+                    description: notificationsForm.description,
+                    isNew: true, // Estableces la notificación como nueva por defecto
+                    date: new Date(),
+                    image: imageUrl
+                      ? imageUrl
+                      : "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.facebook.com%2Fsegundaestodo.uio%2F&psig=AOvVaw3FArqnlOB59sZkSODDCzpL&ust=1696361278005000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPiN3K6M2IEDFQAAAAAdAAAAABAD",
+                  });
+
+                  // A continuación, ordenas las notificaciones por fecha
+                  updateNotifications.sort((a, b) => b.date - a.date);
 
                   console.log("ASI SE VA A LA BASE: ", updateNotifications);
-                  updateNotifications.sort((a, b) => b.date - a.date);
 
                   console.log(
                     " - -  - - - - - - - - - -  - - - - - - - - - - - - "
@@ -239,7 +239,8 @@ export const NotificationsForm = () => {
                     " - -  - - - - - - - - - -  - - - - - - - - - - - - "
                   );
 
-                  updateDinamicDocument(user?.userId, "users", {
+                  // Finalmente, actualizas el documento del usuario con las notificaciones actualizadas
+                  updateDinamicDocument(user.userId, "users", {
                     notifications: updateNotifications,
                   });
                 } else {
