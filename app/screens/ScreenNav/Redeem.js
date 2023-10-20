@@ -22,6 +22,8 @@ import {
 import { LoadGeneral } from "../../Components/GeneralComponents/LoadGeneral";
 import { ButtonGeneral } from "../../Components/GeneralComponents/ButtonGeneral";
 import * as Notifications from "expo-notifications";
+import StyledText from "../../theme/StyledText";
+import ImagenImport from "../../theme/Images";
 
 export const Reedem = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -126,7 +128,7 @@ export const Reedem = () => {
     try {
       const data = await fetchRedeemDB();
       const sortedData = data.sort((a, b) => b.date - a.date);
-      const filter = sortedData.filter((order) => order?.pending);
+      const filter = sortedData.filter((order) => order?.status);
       console.log("mi datos de canjes son-------------------------->", filter);
       setRedeemData(filter);
     } catch (error) {}
@@ -176,12 +178,30 @@ export const Reedem = () => {
                 }}
               >
                 <View style={styles.modalText}>
-                  <Text style={{ color: "white" }}>
-                    {orderClient?.client?.name
-                      ? orderClient?.client?.name
-                      : "a"}
-                  </Text>
-                  <Text style={{ color: "white" }}>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <StyledText
+                      style={{
+                        color: "white",
+                        fontFamily: theme.fonts.textBold,
+                        fontSize: 15,
+                      }}
+                    >
+                      {orderClient?.client?.name
+                        ? orderClient?.client?.name.concat(
+                            " ",
+                            orderClient?.client?.lastName
+                          )
+                        : "a"}
+                    </StyledText>
+                  </View>
+
+                  {/* <Text style={{ color: "white" }}>
                     {orderClient?.totalAmount?.goldCoins &&
                     orderClient?.totalAmount?.silverCoins
                       ? "M.Oro: " +
@@ -189,7 +209,81 @@ export const Reedem = () => {
                         " M.Plata: " +
                         orderClient?.totalAmount?.silverCoins
                       : "2 "}{" "}
-                  </Text>
+                  </Text> */}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 2,
+                      paddingHorizontal: 10,
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor: theme.colors.blackSegunda,
+                        padding: 5,
+                        borderRadius: 20,
+                        //width: "100%",
+                        flexDirection: "row",
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderColor: theme.colors.whiteSegunda,
+                        borderWidth: 1,
+                        marginHorizontal: 5,
+                      }}
+                    >
+                      <StyledText
+                        style={{
+                          fontFamily: theme.fonts.textBold,
+                          color: "white",
+                          fontSize: 15,
+                        }}
+                      >
+                        {orderClient?.totalAmount?.goldCoins}
+                      </StyledText>
+                      <Image
+                        source={ImagenImport.coin}
+                        style={{
+                          width: 15,
+                          height: 15,
+                          marginHorizontal: 5,
+                        }}
+                      />
+                    </View>
+                    <View
+                      style={{
+                        backgroundColor: theme.colors.blackSegunda,
+                        padding: 5,
+                        borderRadius: 20,
+                        //width: "100%",
+                        flexDirection: "row",
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        borderColor: theme.colors.whiteSegunda,
+                        borderWidth: 1,
+                        marginHorizontal: 5,
+                      }}
+                    >
+                      <StyledText
+                        style={{
+                          fontFamily: theme.fonts.textBold,
+                          color: "white",
+                          fontSize: 15,
+                        }}
+                      >
+                        {orderClient?.totalAmount?.silverCoins}
+                      </StyledText>
+                      <Image
+                        source={ImagenImport.coin}
+                        style={{
+                          width: 15,
+                          height: 15,
+                          marginHorizontal: 5,
+                        }}
+                      />
+                    </View>
+                  </View>
                 </View>
                 <View
                   style={{
@@ -219,31 +313,143 @@ export const Reedem = () => {
                       >
                         <Image
                           source={{ uri: prod?.imgUrl ? prod?.imgUrl : "" }}
-                          style={{ width: 80, height: "100%", borderRadius: 5 }}
+                          style={{
+                            width: "25%",
+                            height: "100%",
+                            borderRadius: 5,
+                            resizeMode: "stretch",
+                          }}
                         />
-                        <View style={{ flex: 4, paddingHorizontal: 10 }}>
-                          <Text
+                        <View style={{ flex: 1 }}>
+                          <View
                             style={{
-                              color: "white",
-                              textAlign: "center",
-                              fontSize: 15,
+                              flex: 1,
+                              //paddingHorizontal: 10,
+                              //backgroundColor: "red",
+                              paddingHorizontal: 5,
                             }}
                           >
-                            {prod?.name ? prod?.name : "Ceviche"}
-                          </Text>
-                        </View>
+                            <StyledText
+                              style={{
+                                color: "white",
+                                //textAlign: "center",
 
-                        <Text
-                          style={{
-                            flex: 1,
-                            //   backgroundColor: "cyan",
-                            color: "white",
-                            textAlign: "center",
-                            fontSize: 17,
-                          }}
-                        >
-                          x{prod.quantity}
-                        </Text>
+                                fontSize: 15,
+                                fontFamily: theme.fonts.textBold,
+                              }}
+                            >
+                              {prod?.name ? prod?.name : "Ceviche"}
+                            </StyledText>
+                          </View>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              flex: 1,
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              //backgroundColor: "pink",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                flex: 6,
+                                marginHorizontal: 5,
+                                //backgroundColor: "blue",
+                              }}
+                            >
+                              <View
+                                style={{
+                                  backgroundColor: theme.colors.blackSegunda,
+                                  padding: 5,
+                                  borderRadius: 20,
+                                  //width: "100%",
+                                  flexDirection: "row",
+                                  flex: 1,
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  borderColor: theme.colors.whiteSegunda,
+                                  borderWidth: 1,
+                                }}
+                              >
+                                <StyledText
+                                  style={{
+                                    fontFamily: theme.fonts.textBold,
+                                    color: "white",
+                                    fontSize: 15,
+                                  }}
+                                >
+                                  {prod?.productTotalCoins?.goldCoins}
+                                </StyledText>
+                                <Image
+                                  source={ImagenImport.coin}
+                                  style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginHorizontal: 5,
+                                  }}
+                                />
+                              </View>
+                              <View
+                                style={{
+                                  backgroundColor: theme.colors.blackSegunda,
+                                  padding: 5,
+                                  borderRadius: 20,
+                                  //width: "100%",
+                                  flex: 1,
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  marginHorizontal: 5,
+                                  flexDirection: "row",
+                                  borderColor: theme.colors.whiteSegunda,
+                                  borderWidth: 1,
+                                }}
+                              >
+                                <StyledText
+                                  style={{
+                                    fontFamily: theme.fonts.textBold,
+                                    color: "white",
+                                    fontSize: 15,
+                                  }}
+                                >
+                                  {prod?.productTotalCoins?.silverCoins}
+                                </StyledText>
+                                <Image
+                                  source={ImagenImport.coin}
+                                  style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginHorizontal: 5,
+                                    //marginLeft: 5,
+                                  }}
+                                />
+                              </View>
+                            </View>
+                            <View
+                              style={{
+                                flex: 1,
+                                //backgroundColor: "cyan",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              <StyledText
+                                style={{
+                                  //flex: 1,
+                                  //backgroundColor: "cyan",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  fontFamily: theme.fonts.textBold,
+                                  color: "white",
+                                  textAlign: "center",
+                                  fontSize: 15,
+                                }}
+                              >
+                                x{prod.quantity}
+                              </StyledText>
+                            </View>
+                          </View>
+                        </View>
                       </View>
                     ))}
                   </ScrollView>
@@ -316,43 +522,60 @@ export const Reedem = () => {
 
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             {/* <Text style={styles.text}>Contenido del ScrollView</Text> */}
-            {redeemData?.map((item, index) => (
-              <ItemComent
-                key={index}
-                textSize={17}
-                onPress={() => {
-                  setOrderClient(item);
-                  setModalVisible(true);
+            {redeemData.length > 0 ? (
+              redeemData?.map((item, index) => (
+                <ItemComent
+                  key={index}
+                  textSize={17}
+                  onPress={() => {
+                    setOrderClient(item);
+                    setModalVisible(true);
 
-                  // console.log("item---------------->", item.products);
+                    // console.log("item---------------->", item.products);
+                  }}
+                  background={
+                    // item.status ? theme.colors.redSegunda : theme.colors.grey
+                    "black"
+                  }
+                  width={"90%"}
+                  border={2}
+                  data={item?.client}
+                  icon={
+                    <Icon
+                      name={item?.isGroup ? "users" : "user-alt"}
+                      size={20}
+                      type={"entypo"}
+                      color={
+                        item?.isGroup ? theme.colors.orangeSegunda : "orange"
+                      }
+                    />
+                  }
+                  date={item?.date}
+                  icon2={
+                    <Icon2
+                      name={item.status ? "checkcircle" : "checkcircleo"}
+                      size={20}
+                      type={"entypo"}
+                      color={item.status ? "#82EF7B" : "white"}
+                    />
+                  }
+                />
+              ))
+            ) : (
+              <View
+                style={{
+                  //flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  //backgroundColor: "red",
+                  width: "100%",
+                  //top: "50%",
+                  height: "100%",
                 }}
-                background={
-                  // item.status ? theme.colors.redSegunda : theme.colors.grey
-                  "black"
-                }
-                width={"90%"}
-                border={2}
-                data={item?.client}
-                icon={
-                  <Icon
-                    name={item?.isGroup ? "users" : "user-alt"}
-                    size={20}
-                    type={"entypo"}
-                    color={
-                      item?.isGroup ? theme.colors.orangeSegunda : "orange"
-                    }
-                  />
-                }
-                icon2={
-                  <Icon2
-                    name={item.status ? "checkcircle" : "checkcircleo"}
-                    size={20}
-                    type={"entypo"}
-                    color={item.status ? "#82EF7B" : "white"}
-                  />
-                }
-              />
-            ))}
+              >
+                <StyledText color={"white"}>Sin canjes pendientes</StyledText>
+              </View>
+            )}
           </ScrollView>
           {/* <ButtonGeneral title={"boton"} onPress                               
           
@@ -382,6 +605,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     minWidth: "100%",
+    width: "100%",
+    //top: "50%",
+    //height: "100%",
   },
   text: {
     fontSize: 20,

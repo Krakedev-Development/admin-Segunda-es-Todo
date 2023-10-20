@@ -759,7 +759,7 @@ export const TriviaDetails = ({ route, navigation }) => {
       <View style={{ padding: 10 }}>
         <View style={{ marginBottom: 10 }}>
           <TextInput
-            value={triviaForm.title}
+            value={triviaForm.title ? triviaForm.title : null}
             //placeholder="Título"
             onChangeText={(txt) => {
               setTriviaForm({ ...triviaForm, title: txt });
@@ -771,7 +771,7 @@ export const TriviaDetails = ({ route, navigation }) => {
         </View>
         <View style={{ marginBottom: 10 }}>
           <TextInput
-            value={triviaForm.description}
+            value={triviaForm.description ? triviaForm.description : null}
             multiline
             onChangeText={(txt) => {
               setTriviaForm({ ...triviaForm, description: txt });
@@ -781,6 +781,19 @@ export const TriviaDetails = ({ route, navigation }) => {
             mode="outlined"
           />
         </View>
+        {/* <View style={{ marginBottom: 10 }}>
+          <TextInput
+            value={triviaForm.points ? triviaForm.points.toString() : null}
+            //multiline
+            onChangeText={(txt) => {
+              setTriviaForm({ ...triviaForm, points: parseInt(txt) });
+            }}
+            keyboardType="numeric"
+            //placeholder="Descripción"
+            label={"Descripción"}
+            mode="outlined"
+          />
+        </View> */}
 
         {/* <StyledText subtitle>{trivia.title}</StyledText> */}
         {/* <StyledText style={{ marginVertical: 5, fontSize: 17 }}>
@@ -875,7 +888,7 @@ export const TriviaDetails = ({ route, navigation }) => {
               // Crea una copia del formulario para evitar modificar el original directamente
               const updatedTriviaForm = {
                 ...triviaForm,
-                points: triviaForm.trivia.length,
+                points: 5 * triviaForm.trivia.length,
                 image: image,
               };
 

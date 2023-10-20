@@ -881,7 +881,7 @@ export const NewTrivia = ({ route, navigation }) => {
               // Crea una copia del formulario para evitar modificar el original directamente
               const updatedTriviaForm = {
                 ...triviaForm,
-                points: triviaForm.trivia.length,
+                points: 5 * triviaForm.trivia.length,
                 image: image,
                 alreadyCompleted: [],
               };

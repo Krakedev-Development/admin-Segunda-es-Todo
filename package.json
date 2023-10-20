@@ -22,6 +22,7 @@
     "axios": "^1.5.1",
     "eas-cli": "^5.4.0",
     "expo": "~49.0.13",
+    "expo-barcode-scanner": "^12.7.0",
     "expo-font": "~11.4.0",
     "expo-image-picker": "~14.3.2",
     "expo-location": "~16.1.0",
