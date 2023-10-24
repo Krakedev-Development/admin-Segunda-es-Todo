@@ -31,6 +31,9 @@ import mochila from "../../assets/Productos/Gifts/mochila.jpg";
 import mochilaDeportiva from "../../assets/Productos/Gifts/mochilaDeportiva.jpg";
 export const NEW_PRODUCTS = require("../../assets/images/new_product.png");
 
+export const QR_READER = require("../../assets/images/qr_reader.gif");
+export const GOLD = require("../../assets/images/coin_backup.png");
+export const SILVER = require("../../assets/images/coin.png");
 //UserExamples
 
 import User1 from "../../assets/imgEjemplos/user1.png";

@@ -18,9 +18,9 @@ export const fetchRedeemDB = async () => {
 
 export const updateRedeemDB = async (id) => {
   const redeemRef = doc(global.dbCon, "orders", id);
-  const datosActualizados = {
-    status: true,
-  };
+  // const datosActualizados = {
+  //   status: true,
+  // };
   console.log("mi referencia del documento de canje::::::::::", redeemRef);
   updateDoc(redeemRef, datosActualizados)
     .then(() => {

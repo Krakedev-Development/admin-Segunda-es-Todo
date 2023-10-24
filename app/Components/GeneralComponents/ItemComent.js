@@ -84,7 +84,7 @@ export const ItemComent = ({
     const fechaFormateada = `${dia} /${
       mesIndex + 1
     }/${anio} ${hora}:${minutos}`;
-    console.log("FECHA FORMATEADA: ", fechaFormateada);
+    //console.log("FECHA FORMATEADA: ", fechaFormateada);
 
     return fechaFormateada;
   };

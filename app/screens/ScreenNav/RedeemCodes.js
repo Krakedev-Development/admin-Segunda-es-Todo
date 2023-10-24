@@ -5,6 +5,7 @@ import {
   Platform,
   PermissionsAndroid,
   Image,
+  ScrollView,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 import QRCode from "react-native-qrcode-svg";
@@ -212,166 +213,176 @@ export const RedeemCodes = () => {
   };
 
   return (
-    <View style={[styles.container, { marginTop: Constants.statusBarHeight }]}>
+    <ScrollView contentContainerStyle={{ height: "100%" }}>
       <View
-        style={{
-          borderWidth: 0.2,
-          borderColor: "white",
-          borderRadius: 50,
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          alignItems: "center",
-          padding: 5,
-          width: "90%",
-        }}
+        style={[styles.container, { marginTop: Constants.statusBarHeight }]}
       >
-        <TouchableOpacity
-          onPress={() => setSpecialCode(false)}
+        <View
           style={{
-            backgroundColor: specialCode
-              ? theme.colors.blackSegunda
-              : theme.colors.orangeSegunda,
-            padding: 10,
-            //paddingHorizontal: 20,
-            justifyContent: "center",
+            borderWidth: 0.2,
+            borderColor: "white",
+            borderRadius: 50,
+            flexDirection: "row",
+            justifyContent: "space-evenly",
             alignItems: "center",
-            margin: 5,
-            flex: 1,
-            borderRadius: 25,
+            padding: 5,
+            width: "90%",
           }}
         >
-          <StyledText
-            style={{ color: "white", fontFamily: theme.fonts.textBold }}
+          <TouchableOpacity
+            onPress={() => setSpecialCode(false)}
+            style={{
+              backgroundColor: specialCode
+                ? theme.colors.blackSegunda
+                : theme.colors.orangeSegunda,
+              padding: 10,
+              //paddingHorizontal: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              margin: 5,
+              flex: 1,
+              borderRadius: 25,
+            }}
           >
-            Código personal
-          </StyledText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setSpecialCode(true)}
-          style={{
-            backgroundColor: specialCode
-              ? theme.colors.orangeSegunda
-              : theme.colors.blackSegunda,
-            padding: 10,
-            flex: 1,
-            margin: 5,
-            borderRadius: 25,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <StyledText
-            style={{ color: "white", fontFamily: theme.fonts.textBold }}
+            <StyledText
+              style={{ color: "white", fontFamily: theme.fonts.textBold }}
+            >
+              Código personal
+            </StyledText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setSpecialCode(true)}
+            style={{
+              backgroundColor: specialCode
+                ? theme.colors.orangeSegunda
+                : theme.colors.blackSegunda,
+              padding: 10,
+              flex: 1,
+              margin: 5,
+              borderRadius: 25,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            Código promocional
-          </StyledText>
-        </TouchableOpacity>
-      </View>
-      <View style={{ flexDirection: "row", width: "90%" }}>
-        <TextInput
-          style={{ width: "30%", marginVertical: 10, marginRight: 10 }}
-          onChangeText={(txt) => setGold(txt)}
-          value={gold}
-          label={"Monedas de oro"}
-          keyboardType="numeric"
-          mode="outlined"
-        />
-        <TextInput
-          style={{ width: "30%", marginVertical: 10, marginRight: 10 }}
-          onChangeText={(txt) => setSilver(txt)}
-          value={silver}
-          label={"Monedas de plata"}
-          keyboardType="numeric"
-          mode="outlined"
-        />
-        <TextInput
-          style={{ width: "30%", marginVertical: 10 }}
-          onChangeText={(txt) => setCodesNumber(txt)}
-          value={codesNumber}
-          label={"Códigos"}
-          keyboardType="numeric"
-          mode="outlined"
-        />
-      </View>
-      {specialCode && (
-        <TextInput
-          style={{ width: "90%", marginBottom: 15 }}
-          onChangeText={(txt) => setAttempts(parseInt(txt))}
-          value={attempts ? attempts.toString() : null}
-          keyboardType="numeric"
-          label={"Intentos de reclamo"}
-          mode="outlined"
-        />
-      )}
-      <Button
-        onPress={handleDownloadQRCode}
-        loading={generateCode}
-        style={{
-          backgroundColor: theme.colors.orangeSegunda,
-          borderRadius: 5,
-          //flex: 1,
-          width: "90%",
-        }}
-      >
-        <StyledText
-          style={{ fontFamily: theme.fonts.textBold, color: "white" }}
-        >
-          {generateCode ? "Generando" : "Crear QR"}
-        </StyledText>
-      </Button>
-      {qrCode && (
-        <View style={{ marginTop: 30 }}>
-          <View style={{ marginVertical: 20 }}>
-            <View
-              style={{ width: "100%", alignItems: "center", marginBottom: 10 }}
-            >
-              <StyledText
-                style={{ color: "white", fontFamily: theme.fonts.textBold }}
-              >
-                DATOS DEL QR
-              </StyledText>
-            </View>
             <StyledText
               style={{ color: "white", fontFamily: theme.fonts.textBold }}
             >
-              ID: {qrCode?.id}
+              Código promocional
             </StyledText>
-            <StyledText
-              style={{ color: "white", fontFamily: theme.fonts.textBold }}
-            >
-              MONEDAS DE ORO: {qrCode?.money?.gold}
-            </StyledText>
-            <StyledText
-              style={{ color: "white", fontFamily: theme.fonts.textBold }}
-            >
-              MONEDAS DE PLATA: {qrCode?.money?.silver}
-            </StyledText>
-            {qrCode?.attempts && (
-              <StyledText
-                style={{ color: "white", fontFamily: theme.fonts.textBold }}
-              >
-                INTENTOS: {qrCode?.attempts}
-              </StyledText>
-            )}
-          </View>
-          <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1.0 }}>
-            <QRCode
-              ref={qrCodeRef}
-              value={JSON.stringify(qrCode)}
-              size={300}
-              color="black"
-              backgroundColor="white"
-            />
-          </ViewShot>
+          </TouchableOpacity>
         </View>
-      )}
-      {/* <Image
+        <View style={{ flexDirection: "row", width: "90%" }}>
+          <TextInput
+            style={{ width: "30%", marginVertical: 10, marginRight: 10 }}
+            onChangeText={(txt) => setGold(txt)}
+            value={gold}
+            label={"Monedas de oro"}
+            keyboardType="numeric"
+            mode="outlined"
+          />
+          <TextInput
+            style={{ width: "30%", marginVertical: 10, marginRight: 10 }}
+            onChangeText={(txt) => setSilver(txt)}
+            value={silver}
+            label={"Monedas de plata"}
+            keyboardType="numeric"
+            mode="outlined"
+          />
+          <TextInput
+            style={{ width: "30%", marginVertical: 10 }}
+            onChangeText={(txt) => setCodesNumber(txt)}
+            value={codesNumber}
+            label={"Códigos"}
+            keyboardType="numeric"
+            mode="outlined"
+          />
+        </View>
+        {specialCode && (
+          <TextInput
+            style={{ width: "90%", marginBottom: 15 }}
+            onChangeText={(txt) => setAttempts(parseInt(txt))}
+            value={attempts ? attempts.toString() : null}
+            keyboardType="numeric"
+            label={"Intentos de reclamo"}
+            mode="outlined"
+          />
+        )}
+        <Button
+          onPress={handleDownloadQRCode}
+          loading={generateCode}
+          style={{
+            backgroundColor: theme.colors.orangeSegunda,
+            borderRadius: 5,
+            //flex: 1,
+            width: "90%",
+          }}
+        >
+          <StyledText
+            style={{ fontFamily: theme.fonts.textBold, color: "white" }}
+          >
+            {generateCode ? "Generando" : "Crear QR"}
+          </StyledText>
+        </Button>
+        {qrCode && (
+          <View style={{ marginTop: 30 }}>
+            <View style={{ marginVertical: 20 }}>
+              <View
+                style={{
+                  width: "100%",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}
+              >
+                <StyledText
+                  style={{ color: "white", fontFamily: theme.fonts.textBold }}
+                >
+                  DATOS DEL QR
+                </StyledText>
+              </View>
+              <StyledText
+                style={{ color: "white", fontFamily: theme.fonts.textBold }}
+              >
+                ID: {qrCode?.id}
+              </StyledText>
+              <StyledText
+                style={{ color: "white", fontFamily: theme.fonts.textBold }}
+              >
+                MONEDAS DE ORO: {qrCode?.money?.gold}
+              </StyledText>
+              <StyledText
+                style={{ color: "white", fontFamily: theme.fonts.textBold }}
+              >
+                MONEDAS DE PLATA: {qrCode?.money?.silver}
+              </StyledText>
+              {qrCode?.attempts && (
+                <StyledText
+                  style={{ color: "white", fontFamily: theme.fonts.textBold }}
+                >
+                  INTENTOS: {qrCode?.attempts}
+                </StyledText>
+              )}
+            </View>
+            <ViewShot
+              ref={viewShotRef}
+              options={{ format: "png", quality: 1.0 }}
+            >
+              <QRCode
+                ref={qrCodeRef}
+                value={JSON.stringify(qrCode)}
+                size={300}
+                color="black"
+                backgroundColor="white"
+              />
+            </ViewShot>
+          </View>
+        )}
+        {/* <Image
         source={{
           uri: "file:///storage/emulated/0/Pictures/QgHrgViP7G59h4Fc3WJk_0.png",
         }}
         style={{ width: 100, height: 100, marginVertical: 20 }}
       /> */}
-      {/* {qrCodes.map((qrCodeInfo, index) => (
+        {/* {qrCodes.map((qrCodeInfo, index) => (
         <View key={index}>
           <Image
             source={{ uri: "file://" + qrCodeInfo.uri }}
@@ -383,8 +394,24 @@ export const RedeemCodes = () => {
         </View>
       ))} */}
 
-      <Button onPress={generateAndExportPDF}>Exportar a PDF</Button>
-    </View>
+        <Button
+          style={{
+            backgroundColor: theme.colors.greylow,
+            marginVertical: 10,
+            width: "90%",
+            borderRadius: 5,
+          }}
+          onPress={generateAndExportPDF}
+        >
+          <StyledText
+            style={{ fontFamily: theme.fonts.textBold }}
+            color={"black"}
+          >
+            Exportar a PDF
+          </StyledText>
+        </Button>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -392,6 +419,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     //justifyContent: "center",
+    height: "100%",
     backgroundColor: theme.colors.blackSegunda,
     paddingVertical: 30,
     alignItems: "center",

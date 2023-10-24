@@ -5,6 +5,7 @@ import {
   setDoc,
   deleteDoc,
   stora,
+  getDoc,
   addDoc,
   updateDoc,
 } from "firebase/firestore";
@@ -92,4 +93,18 @@ export const deleteImageStorage = (imageName) => {
     .catch((error) => {
       console.error("Error al eliminar la imagen:", error);
     });
+};
+
+export const getDinamicDoc = async (collectionName, id) => {
+  const docRef = doc(global.dbCon, collectionName, id);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    //console.log("Document data:", docSnap.data());
+    return docSnap.data();
+  } else {
+    // docSnap.data() will be undefined in this case
+    //console.log("No such document!");
+    return null;
+  }
 };

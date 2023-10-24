@@ -5,13 +5,15 @@ import {
   Text,
   View,
   Image,
-  Modal,
   TouchableOpacity,
+  Linking,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { TextGeneral } from "../../Components/GeneralComponents/TextGeneral";
 import { ItemComent } from "../../Components/GeneralComponents/ItemComent";
-import Icon from "react-native-vector-icons/FontAwesome5";
+//import Icon from "react-native-vector-icons/FontAwesome5";
 import Icon2 from "react-native-vector-icons/AntDesign";
 import logos from "../../theme/logos";
 import {
@@ -20,69 +22,41 @@ import {
   updateRedeemDB,
 } from "../../Services/CanjesSrv";
 import { LoadGeneral } from "../../Components/GeneralComponents/LoadGeneral";
-import { ButtonGeneral } from "../../Components/GeneralComponents/ButtonGeneral";
-import * as Notifications from "expo-notifications";
 import StyledText from "../../theme/StyledText";
-import ImagenImport from "../../theme/Images";
+import ImagenImport, { QR_READER } from "../../theme/Images";
+import { BarCodeScanner } from "expo-barcode-scanner";
+import Modal from "react-native-modal";
+import { Icon } from "@rneui/base";
+import { getDinamicDoc, updateDinamicDocument } from "../../Services/firebase";
+import { MoneysView } from "../../Components/MoneysView";
+import { FlatList } from "react-native";
 
 export const Reedem = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [orderClient, setOrderClient] = useState([]);
   const [redeemData, setRedeemData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const [load, setLoad] = useState(false);
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyD3tzUWpDwEMzeBnH0Zc1Z4_NFV_noTyjc",
-    authDomain: "segundaestodoapp.firebaseapp.com",
-    projectId: "segundaestodoapp",
-    storageBucket: "segundaestodoapp.appspot.com",
-    messagingSenderId: "917966498579",
-    appId: "1:917966498579:web:e7c247c1f79709056048e6",
-    measurementId: "G-NMH9NR2JMD",
-  };
+  const [isActiveQrReader, setIsActiveQrReader] = useState(false);
+  const [activeScanner, setActiveScanner] = useState(false);
+  const [reading, setReading] = useState(false);
+  const [isReading, setIsReading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isVisiblePermissionsModal, setIsVisiblePermissionsModal] =
+    useState(false);
+  const [isActiveQrIndicator, setIsActiveQrIndicator] = useState(false);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [qrIndicator, setQrIndicator] = useState(false);
+  const [X, setX] = useState(0);
+  const [Y, setY] = useState(0);
+  const [width, setWidth] = useState(0);
+  const [height, setHeigth] = useState(0);
+  const [orderId, setOrderId] = useState(null);
 
   useEffect(() => {
-    loadData(); // Notifications.requestPermissionsAsync();
-    // const registerForPushNotifications = async () => {
-    //   try {
-    //     console.log("Inicie mi registro");
-    //     const { status: existingStatus } =
-    //       await Notifications.getPermissionsAsync();
-    //     let finalStatus = existingStatus;
-    //     console.log("Mi finalStatus", finalStatus);
-
-    //     if (existingStatus !== "granted") {
-    //       const { status } = await Notifications.requestPermissionsAsync();
-    //       finalStatus = status;
-    //     }
-
-    //     // if (finalStatus !== "granted") {
-    //     //   return;
-    //     // }
-
-    //     const token = await Notifications.getExpoPushTokenAsync();
-    //     console.log("mi token:::::::::", token);
-    //     // Envía el token a tu backend para futuras notificaciones
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // };
-
-    // registerForPushNotifications();
-  }, []);
-
-  const sendNotification = async () => {
-    const token = await Notifications.getExpoPushTokenAsync();
-    console.log("mi token:::::::::", token);
-    console.log("aplaste mi notificar");
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Nueva notificación",
-        body: "¡Esta es una notificación de prueba!",
-      },
-      trigger: null, // Puedes configurar el disparador si deseas una notificación programada
-    });
-  };
+    loadData();
+  }, [refresh]);
 
   const cargarRDB = async () => {
     console.log(
@@ -93,44 +67,17 @@ export const Reedem = () => {
     // console.log("Mi alt realtime database: ", alt);
   };
 
-  // const cargarDatosRealTime = () => {
-  //   const firebase = require("firebase/app");
-  //   require("firebase/database");
-
-  //   const firebaseConfig = {
-  //     apiKey: "AIzaSyD3tzUWpDwEMzeBnH0Zc1Z4_NFV_noTyjc",
-  //     authDomain: "segundaestodoapp.firebaseapp.com",
-  //     projectId: "segundaestodoapp",
-  //     storageBucket: "segundaestodoapp.appspot.com",
-  //     messagingSenderId: "917966498579",
-  //     appId: "1:917966498579:web:e7c247c1f79709056048e6",
-  //     measurementId: "G-NMH9NR2JMD",
-  //   };
-
-  //   firebase.initializeApp(firebaseConfig);
-  //   const database = firebase.database();
-  //   const ref = database.ref(
-  //     "https://segundaestodoapp-default-rtdb.firebaseio.com/__collections__/orders"
-  //   );
-  //   ref
-  //     .once("value")
-  //     .then((snapshot) => {
-  //       const data = snapshot.val();
-  //       console.log(data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error al leer datos:", error);
-  //     });
-  // };
-
   const loadData = async () => {
     setLoad(true);
     try {
       const data = await fetchRedeemDB();
       const sortedData = data.sort((a, b) => b.date - a.date);
-      const filter = sortedData.filter((order) => order?.status);
-      console.log("mi datos de canjes son-------------------------->", filter);
-      setRedeemData(filter);
+      //const filter = sortedData.filter((order) => order?.status);
+      console.log(
+        "mi datos de canjes son-------------------------->",
+        sortedData
+      );
+      setRedeemData(sortedData);
     } catch (error) {}
     setLoad(false);
   };
@@ -144,8 +91,689 @@ export const Reedem = () => {
     loadData();
   };
 
+  const openAppSettings = () => {
+    Linking.openSettings();
+  };
+
+  const getBarCodeScannerPermissions = async () => {
+    const { status } = await BarCodeScanner.requestPermissionsAsync();
+    setHasPermission(status === "granted");
+    if (status === "granted") {
+      console.log("PERMISOS CONCEDIDOS");
+    } else {
+      console.log("PERMISOS DENEGADOS");
+      // Los permisos se han denegado
+      //openAppSettings(); // Abre la configuración de permisos
+    }
+
+    return status;
+  };
+
+  useEffect(() => {
+    getBarCodeScannerPermissions();
+  }, []);
+
+  const ScannerModal = ({ orderId, isActiveQrReader }) => {
+    const [loading, setLoading] = useState({
+      state: false,
+      message: "",
+    });
+    const [orderData, setOrderData] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
+
+    useEffect(() => {
+      if (isActiveQrReader) {
+        setIsVisible(true);
+        setLoading({ state: true, message: "Preparando cámara" });
+        setTimeout(() => {
+          setLoading({ state: false, message: "" });
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setIsVisible(false);
+        }, 1000);
+      }
+    }, [isActiveQrReader]);
+
+    useEffect(() => {
+      if (orderId) {
+        setLoading({ state: true, message: "Validando el código" });
+        console.log("ESTO TIENE EL QR: ", orderId);
+        queryOrder(orderId, setLoading, setOrderData, setShowAlert);
+      }
+    }, [orderId]);
+
+    useEffect(() => {
+      if (showAlert) {
+        console.log("mostrando la alerta: ", showAlert);
+      }
+      console.log("ESTADO DE LA ALERTA: ", showAlert);
+    }, [showAlert]);
+
+    return (
+      <Modal
+        isVisible={isVisible}
+        onSwipeComplete={() => setIsVisible(false)}
+        swipeDirection={["up", "left", "right", "down"]}
+        animationOut={"slideInDown"}
+        animationOutTiming={600}
+        style={{
+          justifyContent: "flex-end",
+
+          margin: 0,
+        }}
+      >
+        <View
+          style={{
+            flex: 0.9,
+            borderRadius: 10,
+            padding: 10,
+
+            backgroundColor: theme.colors.whiteSegunda,
+
+            margin: 0,
+          }}
+        >
+          <View
+            style={{
+              padding: 10,
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              //backgroundColor: "red",
+            }}
+          >
+            <StyledText
+              subheading
+              //style={{ fontFamily: FONTS[900] }}
+            >
+              ESCANEA EL CÓDIGO QR
+            </StyledText>
+          </View>
+
+          <View
+            style={{
+              flex: 20,
+              width: "100%",
+              height: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {loading.state ? (
+              <View
+                style={{
+                  flex: 1,
+                  //backgroundColor: "red",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <View
+                  style={{ flex: 1, padding: 25, justifyContent: "flex-end" }}
+                >
+                  <ActivityIndicator size={40} />
+                </View>
+
+                <View
+                  style={{ flex: 1, padding: 25, justifyContent: "center" }}
+                >
+                  <StyledText
+                    style={{
+                      fontFamily: theme.fonts.textBold,
+                      fontSize: 25,
+                      flex: 1,
+                    }}
+                  >
+                    {loading.message}
+                  </StyledText>
+                </View>
+              </View>
+            ) : showAlert ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: 10,
+                }}
+              >
+                <StyledText>
+                  EL QR ESCANEADO NO PERTENECE A NUESTRO LOCAL
+                </StyledText>
+              </View>
+            ) : orderData ? (
+              <View
+                style={{
+                  flex: 1,
+                  //backgroundColor: "red",
+                  width: "100%",
+                  padding: 10,
+                }}
+              >
+                <View
+                  style={{ justifyContent: "center", alignItems: "center" }}
+                >
+                  <StyledText
+                    subtitle
+                    style={{ fontFamily: theme.fonts.textBold }}
+                  >
+                    DETALLE DEL PEDIDO
+                  </StyledText>
+                </View>
+                <View style={{ paddingVertical: 10, flex: 5 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      backgroundColor: theme.colors.greySegunda,
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      borderRadius: 10,
+                    }}
+                  >
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        source={{ uri: orderData.client.imgUrl }}
+                        style={{
+                          width: 90,
+                          height: 90,
+                          resizeMode: "stretch",
+                          borderRadius: 45,
+                        }}
+                      />
+                    </View>
+                    <View style={{ flex: 2.5, padding: 5 }}>
+                      <StyledText color={"black"} style={{ fontSize: 19 }}>
+                        {orderData.client.name.concat(
+                          " ",
+                          orderData.client.lastName
+                        )}
+                      </StyledText>
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingVertical: 5,
+                        }}
+                      >
+                        <View style={{ paddingVertical: 10 }}>
+                          <StyledText color={"black"} style={{ fontSize: 19 }}>
+                            Total del pedido:
+                          </StyledText>
+                        </View>
+                        <View>
+                          <MoneysView
+                            gold={orderData.totalAmount.goldCoins}
+                            silver={orderData.totalAmount.silverCoins}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      //flex: 1,
+                      backgroundColor: theme.colors.greySegunda,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 10,
+                      paddingVertical: 5,
+                      marginVertical: 10,
+                      //height: "60%",
+                      //width: "100%",
+                    }}
+                  >
+                    <FlatList
+                      data={orderData.products}
+                      style={
+                        {
+                          //flex: 1,
+                          //height: "60%",
+                          //width: "100%",
+                          //backgroundColor: "pink",
+                        }
+                      }
+                      keyExtractor={(item, index) => item.id.toString()}
+                      renderItem={({ item, index }) => {
+                        return (
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              flex: 1,
+                              //marginVertical: 2,
+                              //backgroundColor: theme.colors.grey,
+                              //height: "100%",
+                              width: "72%",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flex: 1,
+                                padding: 5,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                //backgroundColor: "blue",
+                              }}
+                            >
+                              <Image
+                                source={{ uri: item.imgUrl }}
+                                style={{ width: 80, height: 80 }}
+                              />
+                            </View>
+                            <View
+                              style={{
+                                flex: 3,
+                                padding: 5,
+                                //backgroundColor: "yellow",
+                              }}
+                            >
+                              <View style={{ marginVertical: 1 }}>
+                                <StyledText
+                                  style={{
+                                    fontFamily: theme.fonts.textBold,
+                                    fontSize: 17,
+                                  }}
+                                >
+                                  {item.name}
+                                </StyledText>
+                              </View>
+                              <View style={{ marginVertical: 1 }}>
+                                <StyledText>{item?.description}</StyledText>
+                              </View>
+
+                              <View
+                                style={{
+                                  width: "50%",
+                                  paddingVertical: 5,
+                                  //backgroundColor: "blue",
+                                }}
+                              >
+                                <MoneysView
+                                  gold={item.productTotalCoins?.goldCoins}
+                                  silver={item.productTotalCoins?.silverCoins}
+                                />
+                              </View>
+                            </View>
+                          </View>
+                        );
+                      }}
+                    />
+                  </View>
+                </View>
+                <View
+                  style={{
+                    padding: 9,
+                    flex: 0.5,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    //backgroundColor: "pink",
+                  }}
+                >
+                  {!orderData?.status ? (
+                    <TouchableOpacity
+                      style={{
+                        padding: 10,
+                        backgroundColor: theme.colors.orangeSegunda,
+                        borderRadius: 5,
+                        flexDirection: "row",
+                        width: "100%",
+                        flex: 1,
+                        alignItems: "center",
+                        //width: "55%",
+                        justifyContent: "space-evenly",
+                        shadowColor: "#333333",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.27,
+                        shadowRadius: 4.65,
+
+                        elevation: 6,
+                      }}
+                      onPress={() => {
+                        updateDinamicDocument(orderData.orderId, "orders", {
+                          status: true,
+                        });
+                        setScanned(false);
+                        setQrIndicator(false);
+                        setIsVisible(false);
+                        setIsActiveQrReader(false);
+                        setIsVisiblePermissionsModal(false);
+                        setIsActiveQrIndicator(false);
+                        setRefresh(!refresh);
+                        setOrderData(null);
+                        setLoading({ state: false, message: "" });
+                        setOrderId(null);
+                        setShowAlert(false);
+                        //setActiveScanner(false);
+                      }}
+                    >
+                      <View
+                        style={{
+                          flex: 1,
+                          alignItems: "center",
+                          paddingHorizontal: 5,
+                          //backgroundColor: "pink",
+                        }}
+                      >
+                        <StyledText
+                          style={{
+                            fontFamily: theme.fonts.textBold,
+                            color: "white",
+                            fontSize: 20,
+                            //marginLeft: 10,
+                          }}
+                        >
+                          Confirmar canje
+                        </StyledText>
+                      </View>
+                      {/* <View
+                      style={{
+                        flex: 1,
+                        alignItems: "flex-start",
+                        paddingHorizontal: 5,
+                        //backgroundColor: "green",
+                      }}
+                    >
+                      <Icon
+                        name="x-circle"
+                        type="feather"
+                        size={25}
+                        color={"white"}
+                        //style={{ flex: 1 }}
+                      />
+                    </View> */}
+                    </TouchableOpacity>
+                  ) : (
+                    <View>
+                      <StyledText
+                        style={{
+                          fontFamily: theme.fonts.textBold,
+                          //color: "white",
+                          fontSize: 20,
+                          //marginLeft: 10,
+                        }}
+                      >
+                        Canje reclamado
+                      </StyledText>
+                    </View>
+                  )}
+                </View>
+              </View>
+            ) : (
+              <BarCodeScanner
+                BarCodeScannerSettings={{
+                  barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
+                }}
+                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  {
+                    flex: 1,
+                  },
+                ]}
+              />
+            )}
+          </View>
+          {/* {isActiveQrIndicator && (
+            <View
+              style={{
+                position: "absolute",
+                top: Y,
+                left: X,
+                width: width,
+                height: height,
+                borderColor: "red",
+                borderWidth: 2,
+              }}
+            ></View>
+          )} */}
+
+          <View
+            style={{
+              padding: 9,
+              flex: 1.5,
+              justifyContent: "center",
+              alignItems: "center",
+              //backgroundColor: "pink",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                backgroundColor: theme.colors.redSegunda,
+                borderRadius: 5,
+                flexDirection: "row",
+                width: "100%",
+                flex: 1,
+                alignItems: "center",
+                //width: "55%",
+                justifyContent: "space-evenly",
+                shadowColor: "#333333",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.27,
+                shadowRadius: 4.65,
+
+                elevation: 6,
+              }}
+              onPress={() => {
+                setScanned(false);
+                setQrIndicator(false);
+                setIsVisible(false);
+                setIsActiveQrReader(false);
+                setIsVisiblePermissionsModal(false);
+                setIsActiveQrIndicator(false);
+                //setRefresh(!refresh);
+                setOrderData(null);
+                setLoading({ state: false, message: "" });
+                setOrderId(null);
+                setShowAlert(false);
+                //setActiveScanner(false);
+              }}
+            >
+              <View
+                style={{
+                  flex: 1.3,
+                  alignItems: "flex-end",
+                  paddingHorizontal: 5,
+                  //backgroundColor: "pink",
+                }}
+              >
+                <StyledText
+                  style={{
+                    fontFamily: theme.fonts.textBold,
+                    color: "white",
+                    fontSize: 20,
+                    //marginLeft: 10,
+                  }}
+                >
+                  Cancelar
+                </StyledText>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "flex-start",
+                  paddingHorizontal: 5,
+                  //backgroundColor: "green",
+                }}
+              >
+                <Icon
+                  name="x-circle"
+                  type="feather"
+                  size={25}
+                  color={"white"}
+                  //style={{ flex: 1 }}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const PermissionsModal = () => {
+    return (
+      <Modal
+        isVisible={isVisiblePermissionsModal}
+        onSwipeComplete={() => setIsVisiblePermissionsModal(false)}
+        swipeDirection={["up", "left", "right", "down"]}
+        style={{
+          justifyContent: "flex-end",
+          //backgroundColor: "transparent",
+          margin: 0,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: theme.colors.whiteSegunda,
+            height: "20%",
+            bottom: 0,
+            padding: 15,
+            borderTopStartRadius: 15,
+            borderTopEndRadius: 15,
+          }}
+        >
+          <View style={{ flex: 1.5 }}>
+            <StyledText
+              style={{ fontFamily: theme.fonts.textBold, fontSize: 18 }}
+            >
+              Para escanear los códigos QR, necesitamos que proporciones los
+              permisos de la cámara.
+            </StyledText>
+          </View>
+
+          <View style={{ flexDirection: "row", flex: 1 }}>
+            <TouchableOpacity
+              onPress={() => {
+                openAppSettings(), setIsVisiblePermissionsModal(false);
+              }}
+              style={{
+                padding: 10,
+                flex: 1,
+                backgroundColor: theme.colors.orangeSegunda,
+                borderRadius: 10,
+                marginRight: 4,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <StyledText
+                style={{
+                  fontFamily: theme.fonts.textBold,
+                  fontSize: 17,
+                  color: "white",
+                }}
+              >
+                Conceder permisos
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsVisiblePermissionsModal(false)}
+              style={{
+                padding: 10,
+                flex: 1,
+                marginLeft: 4,
+                backgroundColor: theme.colors.redSegunda,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <StyledText
+                style={{
+                  fontFamily: theme.fonts.textBold,
+                  fontSize: 17,
+                  color: "white",
+                }}
+              >
+                Cancelar
+              </StyledText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const queryOrder = async (
+    orderId,
+    setLoading,
+    setOrderData,
+    setShowAlert
+  ) => {
+    try {
+      let orderData = await getDinamicDoc("orders", orderId);
+      console.log("ORDER DATA: ", orderData);
+      setOrderData(orderData);
+      setLoading({ state: false, message: "" });
+      setScanned(false);
+      setQrIndicator(false);
+    } catch (e) {
+      setShowAlert(true);
+      // setScanned(false);
+      // setQrIndicator(false);
+      // setIsActiveQrReader(false);
+      // setActiveScanner(false);
+      setLoading({ state: false, message: "" });
+      //setOrderId(null);
+      // setScanned(false);
+      // setQrIndicator(false);
+      console.log("ALERTA - - - - - - - - - - - - ");
+    }
+  };
+
+  const handleBarCodeScanned = ({ bounds, data }, setLoading, setOrderData) => {
+    setScanned(true);
+    setQrIndicator(true);
+    const { origin, size } = bounds;
+    setX(origin.x);
+    setY(origin.y);
+    setHeigth(size.height);
+    setWidth(size.width);
+
+    console.log("DATA: ", data);
+    try {
+      //setQrIndicator(false);
+      //let jsonObject = data;
+
+      console.log("ESTO TIENE EL QR: ", data);
+      setOrderId(data);
+      //queryOrder(data, setLoading, setOrderData);
+      //setReading(true);
+      //validateQr(jsonObject);
+    } catch (error) {
+      setScanned(false);
+      setQrIndicator(false);
+      setIsActiveQrReader(false);
+      setActiveScanner(false);
+      setOrderId(null);
+      Alert.alert(
+        "Error al escanear el código QR",
+        "Tuvimos problemas al leer el qr, por favor vuelve a intentarlo"
+      );
+      console.error("Error al analizar la cadena JSON:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
+      <PermissionsModal />
+      <ScannerModal orderId={orderId} isActiveQrReader={isActiveQrReader} />
       <View
         style={{
           backgroundColor: "black",
@@ -503,12 +1131,88 @@ export const Reedem = () => {
             </View>
           </View>
         </Modal>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              padding: 5,
+              //flex: 1.2,
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              backgroundColor: "white",
+              borderRadius: 5,
+              shadowColor: "#333333",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.27,
+              shadowRadius: 4.65,
+              //marginHorizontal: 10,
+              elevation: 6,
+              //paddingVertical: 5,
+            }}
+          >
+            <View style={{ flex: 2, paddingHorizontal: 15 }}>
+              <StyledText style={{ marginBottom: 15 }}>
+                Escanea el código para validar el canje
+              </StyledText>
+              <TouchableOpacity
+                onPress={async () => {
+                  let status = await getBarCodeScannerPermissions();
+                  console.log("ESTO DA STATUS: ", status);
+                  if (status === "granted") {
+                    //handleClosePress();
+                    setIsActiveQrReader(true);
+
+                    // setTimeout(() => {
+                    //   setLoading({ state: false, message: "" });
+                    //   //setActiveScanner(true);
+                    // }, 250);
+                  } else {
+                    setIsVisiblePermissionsModal(true);
+                    //openAppSettings();
+                  }
+                }}
+                style={{
+                  padding: 10,
+                  marginVertical: 5,
+                  backgroundColor: theme.colors.orangeSegunda,
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <StyledText
+                  subheading
+                  color={"white"}
+                  //fontFamily={FONTS.bold_700}
+                >
+                  Escanear código QR
+                </StyledText>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                paddingHorizontal: 15,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image source={QR_READER} style={{ width: 100, height: 100 }} />
+            </View>
+          </View>
+        </View>
         {/* //________________________________________________________________________________________________________________________ */}
         <View
           style={{
             backgroundColor: theme.colors.blackSegunda,
-            flex: 1,
-            marginBottom: 40,
+            flex: 5,
+            marginVertical: 10,
+            marginBottom: 20,
             borderRadius: 8,
             // alignItems: "center",
           }}
