@@ -26,12 +26,12 @@ export const ModalEdit = ({
 }) => {
   useEffect(() => {
     console.log("ESTO ES DE ITEM: ", item);
-    setNewImg(item?.imgUrl);
+    setNewImg(item?.image);
     setNewdata({ ...item });
     setLoading(false);
   }, [item]);
 
-  const [newImg, setNewImg] = useState(item?.imgUrl);
+  const [newImg, setNewImg] = useState(item?.image);
   const [loading, setLoading] = useState(false);
   const [usersWithToken, setUsersWithToken] = useState([]);
   const [newData, setNewdata] = useState({
@@ -49,7 +49,7 @@ export const ModalEdit = ({
     let updateData = newData;
     console.log("Esto esta en new data: ", newData);
     let imageUrl = null;
-    if (newImg !== item?.imgUrl) {
+    if (newImg !== item?.image) {
       try {
         imageUrl = await uploadDinamicImage(newImg, newData.id);
       } catch (error) {
@@ -57,7 +57,7 @@ export const ModalEdit = ({
       }
     }
     if (imageUrl) {
-      updateData.imgUrl = imageUrl;
+      updateData.image = imageUrl;
     }
     updateDinamicDocument(updateData.id, "products", updateData);
     setLoading(false);
@@ -119,7 +119,7 @@ export const ModalEdit = ({
                   }}
                 />
               </View>
-              <View style={{ width: "100%", marginRight: 5, flex: 1 }}>
+              {/* <View style={{ width: "100%", marginRight: 5, flex: 1 }}>
                 <Text
                   style={{
                     fontFamily: theme.fonts.text,
@@ -142,7 +142,7 @@ export const ModalEdit = ({
                     setNewdata({ ...newData, stock: parseInt(txt) });
                   }}
                 />
-              </View>
+              </View> */}
             </View>
             <View style={{ flex: 1 }}>
               <Text
@@ -262,8 +262,8 @@ export const ModalEdit = ({
                   <Image
                     source={{ uri: newImg }}
                     style={{
-                      width: 120,
-                      height: 120,
+                      width: 180,
+                      height: 180,
                       resizeMode: "contain",
                       flex: 1,
                     }}
@@ -271,7 +271,7 @@ export const ModalEdit = ({
                 </TouchableOpacity>
               </View>
 
-              <View style={{ flex: 1 }}>
+              {/* <View style={{ flex: 1 }}>
                 <View style={{ width: "100%", marginRight: 5 }}>
                   <Text
                     style={{
@@ -322,7 +322,7 @@ export const ModalEdit = ({
                     }}
                   />
                 </View>
-              </View>
+              </View> */}
             </View>
 
             <View

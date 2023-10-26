@@ -75,15 +75,15 @@ export const Products = ({ navigation }) => {
     return (
       <TouchableOpacity
         onPress={() =>
-          // navigation.navigate("triviaDetails", {
-          //   trivia: item,
-          //   setRefresh: setRefresh,
-          //   refresh: refresh,
-          // })
-          {
-            setItem(item);
-            handleInteractiveModal();
-          }
+        // navigation.navigate("triviaDetails", {
+        //   trivia: item,
+        //   setRefresh: setRefresh,
+        //   refresh: refresh,
+        // })
+        {
+          setItem(item);
+          handleInteractiveModal();
+        }
         }
         style={{
           flex: 1,
@@ -96,7 +96,7 @@ export const Products = ({ navigation }) => {
       >
         <View style={{ flex: 1 }}>
           <Image
-            source={{ uri: item.imgUrl }}
+            source={{ uri: item.image }}
             style={{
               width: 100,
               height: 120,
@@ -180,7 +180,7 @@ export const Products = ({ navigation }) => {
               Stock: {item?.stock}{" "}
             </StyledText>
           )} */}
-          <View>
+          {/* <View>
             <StyledText
               color={"white"}
               style={{
@@ -213,7 +213,7 @@ export const Products = ({ navigation }) => {
                 }}
               />
             </StyledText>
-          </View>
+          </View> */}
           <View style={{ flexDirection: "row" }}>
             <View
               style={{

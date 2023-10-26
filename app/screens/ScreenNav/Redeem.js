@@ -78,14 +78,14 @@ export const Reedem = () => {
         sortedData
       );
       setRedeemData(sortedData);
-    } catch (error) {}
+    } catch (error) { }
     setLoad(false);
   };
 
   const updateRedeemStatus = async (id) => {
     try {
       await updateRedeemDB(id);
-    } catch (error) {}
+    } catch (error) { }
 
     setModalVisible(false);
     loadData();
@@ -154,7 +154,7 @@ export const Reedem = () => {
       <Modal
         isVisible={isVisible}
         onSwipeComplete={() => setIsVisible(false)}
-        swipeDirection={["up", "left", "right", "down"]}
+        //swipeDirection={["left", "right"]}
         animationOut={"slideInDown"}
         animationOutTiming={600}
         style={{
@@ -185,7 +185,7 @@ export const Reedem = () => {
           >
             <StyledText
               subheading
-              //style={{ fontFamily: FONTS[900] }}
+            //style={{ fontFamily: FONTS[900] }}
             >
               ESCANEA EL CÓDIGO QR
             </StyledText>
@@ -249,6 +249,7 @@ export const Reedem = () => {
                   flex: 1,
                   //backgroundColor: "red",
                   width: "100%",
+                  height: '100%',
                   padding: 10,
                 }}
               >
@@ -319,7 +320,7 @@ export const Reedem = () => {
                   </View>
                   <View
                     style={{
-                      //flex: 1,
+                      flex: 1,
                       backgroundColor: theme.colors.greySegunda,
                       alignItems: "center",
                       justifyContent: "center",
@@ -330,11 +331,79 @@ export const Reedem = () => {
                       //width: "100%",
                     }}
                   >
+                    {/* <ScrollView>
+                      {
+                        orderData.products.map((product) => {
+                          return (<View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              flex: 1,
+                              //marginVertical: 2,
+                              //backgroundColor: theme.colors.grey,
+                              //height: "100%",
+                              width: "72%",
+                            }}
+                          >
+                            <View
+                              style={{
+                                flex: 1,
+                                padding: 5,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                //backgroundColor: "blue",
+                              }}
+                            >
+                              <Image
+                                source={{ uri: product.image }}
+                                style={{ width: 80, height: 80 }}
+                              />
+                            </View>
+                            <View
+                              style={{
+                                flex: 3,
+                                padding: 5,
+                                //backgroundColor: "yellow",
+                              }}
+                            >
+                              <View style={{ marginVertical: 1 }}>
+                                <StyledText
+                                  style={{
+                                    fontFamily: theme.fonts.textBold,
+                                    fontSize: 17,
+                                  }}
+                                >
+                                  {product.name}
+                                </StyledText>
+                              </View>
+                              <View style={{ marginVertical: 1 }}>
+                                <StyledText>{product?.description}</StyledText>
+                              </View>
+
+                              <View
+                                style={{
+                                  width: "50%",
+                                  paddingVertical: 5,
+                                  //backgroundColor: "blue",
+                                }}
+                              >
+                                <MoneysView
+                                  gold={product.productTotalCoins?.goldCoins}
+                                  silver={product.productTotalCoins?.silverCoins}
+                                />
+                              </View>
+                            </View>
+                          </View>
+                          );
+                        })
+                      }
+                    </ScrollView> */}
                     <FlatList
                       data={orderData.products}
                       style={
                         {
-                          //flex: 1,
+                          flex: 1,
                           //height: "60%",
                           //width: "100%",
                           //backgroundColor: "pink",
@@ -365,8 +434,8 @@ export const Reedem = () => {
                               }}
                             >
                               <Image
-                                source={{ uri: item.imgUrl }}
-                                style={{ width: 80, height: 80 }}
+                                source={{ uri: item.image }}
+                                style={{ width: 80, height: 80, resizeMode: 'stretch' }}
                               />
                             </View>
                             <View
@@ -616,7 +685,7 @@ export const Reedem = () => {
                   type="feather"
                   size={25}
                   color={"white"}
-                  //style={{ flex: 1 }}
+                //style={{ flex: 1 }}
                 />
               </View>
             </TouchableOpacity>
@@ -822,9 +891,9 @@ export const Reedem = () => {
                     >
                       {orderClient?.client?.name
                         ? orderClient?.client?.name.concat(
-                            " ",
-                            orderClient?.client?.lastName
-                          )
+                          " ",
+                          orderClient?.client?.lastName
+                        )
                         : "a"}
                     </StyledText>
                   </View>
@@ -940,7 +1009,7 @@ export const Reedem = () => {
                         }}
                       >
                         <Image
-                          source={{ uri: prod?.imgUrl ? prod?.imgUrl : "" }}
+                          source={{ uri: prod?.image ? prod?.image : "" }}
                           style={{
                             width: "25%",
                             height: "100%",
@@ -1188,7 +1257,7 @@ export const Reedem = () => {
                 <StyledText
                   subheading
                   color={"white"}
-                  //fontFamily={FONTS.bold_700}
+                //fontFamily={FONTS.bold_700}
                 >
                   Escanear código QR
                 </StyledText>
