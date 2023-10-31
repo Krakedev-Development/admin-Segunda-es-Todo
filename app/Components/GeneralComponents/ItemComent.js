@@ -4,6 +4,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { ImageUsersImport } from "../../theme/Images";
 import theme from "../../theme/theme";
 import StyledText from "../../theme/StyledText";
+import { RatingGeneral } from "./RatingGeneral";
 export const ItemComent = ({
   size,
   title,
@@ -16,16 +17,19 @@ export const ItemComent = ({
   textSize,
   data,
   date,
+  raiting,
 }) => {
+  console.log("DATOS DE USUARIO: ", raiting);
   const styles = StyleSheet.create({
     container: {
       //   flex: 1,
-      marginVertical: 2,
+      marginVertical: 10,
       // justifyContent: "space-around",
-      paddingHorizontal: 18,
+      //paddingHorizontal: 18,
       alignItems: "center",
+      padding: 5,
       backgroundColor: background ? background : "lightblue",
-      height: size ? size : 50,
+      //height: size ? size : 50,
       minWidth: width ? width : "100%",
       borderRadius: border ? border : 0,
       flexDirection: "row",
@@ -103,7 +107,7 @@ export const ItemComent = ({
       >
         <Image
           source={data?.imgUrl ? { uri: data?.imgUrl } : ImageUsersImport.user2}
-          style={{ width: 32, height: 32, borderRadius: 30 }}
+          style={{ width: 40, height: 40, borderRadius: 30 }}
         />
       </View>
       <View
@@ -112,17 +116,13 @@ export const ItemComent = ({
           //backgroundColor: "pink",
           justifyContent: "center",
           alignItems: "center",
-          paddingHorizontal: 10,
+          //paddingHorizontal: 10,
         }}
       >
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={styles.text}>
-            {data?.name
-              ? data?.name.concat(" ", data?.lastName)
-              : "#Codigo-User-00..."}
-          </Text>
+          <Text style={styles.text}>{data?.name ? data?.name : "Nombre"}</Text>
         </View>
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -143,6 +143,17 @@ export const ItemComent = ({
       >
         {icon2 ? icon2 : <></>}
       </View>
+      {raiting && (
+        <Text>
+          <RatingGeneral
+            rating={raiting.raiting}
+            readOnly
+            size={15}
+            color={theme.colors.orangeSegunda}
+            ratingColor={"gold"}
+          />
+        </Text>
+      )}
     </TouchableOpacity>
     // </View>
   );

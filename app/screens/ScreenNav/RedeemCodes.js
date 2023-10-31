@@ -32,6 +32,7 @@ export const RedeemCodes = () => {
   const [qrCodes, setQRCodes] = useState([]);
   const [qrCode, setQrCode] = useState(null);
   const [specialCode, setSpecialCode] = useState(false);
+  const [validateExport, setValidateExport] = useState(false);
   const [generateCode, setGenerateCode] = useState(false);
   const qrCodeRef = useRef(null);
   const viewShotRef = useRef(null);
@@ -76,6 +77,7 @@ export const RedeemCodes = () => {
         } catch (error) {
           console.log("Error: ", error);
         }
+        setValidateExport(true);
       } else {
         alert(
           "No se puede capturar la vista. Asegúrate de que viewShotRef esté definido."
@@ -153,7 +155,7 @@ export const RedeemCodes = () => {
       await RNFS.moveFile(pdfPath, nombreArchivo);
 
       console.log("PDF movido a:", nombreArchivo);
-
+      setValidateExport(false);
       // // Genera el PDF
       // const pdf = await RNHTMLtoPDF.convert(options);
 
@@ -219,58 +221,67 @@ export const RedeemCodes = () => {
       >
         <View
           style={{
-            borderWidth: 0.2,
-            borderColor: "white",
-            borderRadius: 50,
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            alignItems: "center",
-            padding: 5,
-            width: "90%",
+            backgroundColor: theme.colors.blackSegunda,
+            marginBottom: 15,
+            borderRadius: 25,
           }}
         >
-          <TouchableOpacity
-            onPress={() => setSpecialCode(false)}
+          <View
             style={{
-              backgroundColor: specialCode
-                ? theme.colors.blackSegunda
-                : theme.colors.orangeSegunda,
-              padding: 10,
-              //paddingHorizontal: 20,
-              justifyContent: "center",
+              borderWidth: 0.2,
+              borderColor: "white",
+              borderRadius: 50,
+              flexDirection: "row",
+              justifyContent: "space-evenly",
               alignItems: "center",
-              margin: 5,
-              flex: 1,
-              borderRadius: 25,
+              padding: 5,
+              width: "90%",
             }}
           >
-            <StyledText
-              style={{ color: "white", fontFamily: theme.fonts.textBold }}
+            <TouchableOpacity
+              onPress={() => setSpecialCode(false)}
+              style={{
+                backgroundColor: specialCode
+                  ? theme.colors.blackSegunda
+                  : theme.colors.orangeSegunda,
+                padding: 10,
+                //paddingHorizontal: 20,
+                justifyContent: "center",
+                alignItems: "center",
+                margin: 5,
+                flex: 1,
+                borderRadius: 25,
+              }}
             >
-              Código personal
-            </StyledText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setSpecialCode(true)}
-            style={{
-              backgroundColor: specialCode
-                ? theme.colors.orangeSegunda
-                : theme.colors.blackSegunda,
-              padding: 10,
-              flex: 1,
-              margin: 5,
-              borderRadius: 25,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <StyledText
-              style={{ color: "white", fontFamily: theme.fonts.textBold }}
+              <StyledText
+                style={{ color: "white", fontFamily: theme.fonts.textBold }}
+              >
+                Código personal
+              </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setSpecialCode(true)}
+              style={{
+                backgroundColor: specialCode
+                  ? theme.colors.orangeSegunda
+                  : theme.colors.blackSegunda,
+                padding: 10,
+                flex: 1,
+                margin: 5,
+                borderRadius: 25,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
-              Código promocional
-            </StyledText>
-          </TouchableOpacity>
+              <StyledText
+                style={{ color: "white", fontFamily: theme.fonts.textBold }}
+              >
+                Código promocional
+              </StyledText>
+            </TouchableOpacity>
+          </View>
         </View>
+
         <View style={{ flexDirection: "row", width: "90%" }}>
           <TextInput
             style={{ width: "30%", marginVertical: 10, marginRight: 10 }}
@@ -307,6 +318,71 @@ export const RedeemCodes = () => {
             mode="outlined"
           />
         )}
+
+        <View style={{ flex: 1, marginVertical: 10 }}>
+          {qrCode && (
+            <ScrollView style={{ flex: 2 }}>
+              <View style={{ marginVertical: 20 }}>
+                <View
+                  style={{
+                    width: "100%",
+                    alignItems: "center",
+                    marginBottom: 10,
+                  }}
+                >
+                  <StyledText
+                    style={{ color: "black", fontFamily: theme.fonts.textBold }}
+                  >
+                    DATOS DEL QR
+                  </StyledText>
+                </View>
+                <StyledText
+                  style={{ color: "black", fontFamily: theme.fonts.textBold }}
+                >
+                  ID: {qrCode?.id}
+                </StyledText>
+                <StyledText
+                  style={{ color: "black", fontFamily: theme.fonts.textBold }}
+                >
+                  MONEDAS DE ORO: {qrCode?.money?.gold}
+                </StyledText>
+                <StyledText
+                  style={{ color: "black", fontFamily: theme.fonts.textBold }}
+                >
+                  MONEDAS DE PLATA: {qrCode?.money?.silver}
+                </StyledText>
+                {qrCode?.attempts && (
+                  <StyledText
+                    style={{ color: "black", fontFamily: theme.fonts.textBold }}
+                  >
+                    INTENTOS: {qrCode?.attempts}
+                  </StyledText>
+                )}
+              </View>
+              <ViewShot
+                ref={viewShotRef}
+                options={{ format: "png", quality: 1.0 }}
+              >
+                <QRCode
+                  ref={qrCodeRef}
+                  value={JSON.stringify(qrCode)}
+                  size={300}
+                  color="black"
+                  backgroundColor="white"
+                />
+              </ViewShot>
+            </ScrollView>
+          )}
+        </View>
+        <StyledText
+          style={{
+            color: "black",
+            fontFamily: theme.fonts.textBold,
+            marginVertical: 10,
+          }}
+        >
+          QRS generados: {qrCodes.length}
+        </StyledText>
         <Button
           onPress={handleDownloadQRCode}
           loading={generateCode}
@@ -323,59 +399,6 @@ export const RedeemCodes = () => {
             {generateCode ? "Generando" : "Crear QR"}
           </StyledText>
         </Button>
-        {qrCode && (
-          <View style={{ marginTop: 30 }}>
-            <View style={{ marginVertical: 20 }}>
-              <View
-                style={{
-                  width: "100%",
-                  alignItems: "center",
-                  marginBottom: 10,
-                }}
-              >
-                <StyledText
-                  style={{ color: "white", fontFamily: theme.fonts.textBold }}
-                >
-                  DATOS DEL QR
-                </StyledText>
-              </View>
-              <StyledText
-                style={{ color: "white", fontFamily: theme.fonts.textBold }}
-              >
-                ID: {qrCode?.id}
-              </StyledText>
-              <StyledText
-                style={{ color: "white", fontFamily: theme.fonts.textBold }}
-              >
-                MONEDAS DE ORO: {qrCode?.money?.gold}
-              </StyledText>
-              <StyledText
-                style={{ color: "white", fontFamily: theme.fonts.textBold }}
-              >
-                MONEDAS DE PLATA: {qrCode?.money?.silver}
-              </StyledText>
-              {qrCode?.attempts && (
-                <StyledText
-                  style={{ color: "white", fontFamily: theme.fonts.textBold }}
-                >
-                  INTENTOS: {qrCode?.attempts}
-                </StyledText>
-              )}
-            </View>
-            <ViewShot
-              ref={viewShotRef}
-              options={{ format: "png", quality: 1.0 }}
-            >
-              <QRCode
-                ref={qrCodeRef}
-                value={JSON.stringify(qrCode)}
-                size={300}
-                color="black"
-                backgroundColor="white"
-              />
-            </ViewShot>
-          </View>
-        )}
         {/* <Image
         source={{
           uri: "file:///storage/emulated/0/Pictures/QgHrgViP7G59h4Fc3WJk_0.png",
@@ -394,22 +417,24 @@ export const RedeemCodes = () => {
         </View>
       ))} */}
 
-        <Button
-          style={{
-            backgroundColor: theme.colors.greylow,
-            marginVertical: 10,
-            width: "90%",
-            borderRadius: 5,
-          }}
-          onPress={generateAndExportPDF}
-        >
-          <StyledText
-            style={{ fontFamily: theme.fonts.textBold }}
-            color={"black"}
+        {validateExport && (
+          <Button
+            style={{
+              backgroundColor: theme.colors.greySegunda,
+              marginVertical: 10,
+              width: "90%",
+              borderRadius: 5,
+            }}
+            onPress={generateAndExportPDF}
           >
-            Exportar a PDF
-          </StyledText>
-        </Button>
+            <StyledText
+              style={{ fontFamily: theme.fonts.textBold }}
+              color={"black"}
+            >
+              Exportar a PDF
+            </StyledText>
+          </Button>
+        )}
       </View>
     </ScrollView>
   );
@@ -420,7 +445,7 @@ const styles = StyleSheet.create({
     flex: 1,
     //justifyContent: "center",
     height: "100%",
-    backgroundColor: theme.colors.blackSegunda,
+    backgroundColor: theme.colors.whiteSegunda,
     paddingVertical: 30,
     alignItems: "center",
   },

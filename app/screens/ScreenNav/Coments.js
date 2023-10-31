@@ -106,6 +106,7 @@ export const Coments = () => {
                 width={"90%"}
                 border={2}
                 data={item.user}
+                raiting={item}
                 icon={
                   <Icon
                     name={"user-alt"}

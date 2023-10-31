@@ -11,7 +11,14 @@ import {
 import theme from "../../theme/theme";
 import { Rating } from "react-native-elements";
 
-export const RatingGeneral = ({ size, setRating, rating, readOnly, color }) => {
+export const RatingGeneral = ({
+  size,
+  setRating,
+  rating,
+  readOnly,
+  color,
+  ratingColor,
+}) => {
   return (
     <Rating
       // showRating //ver rating
@@ -23,7 +30,7 @@ export const RatingGeneral = ({ size, setRating, rating, readOnly, color }) => {
       }}
       startingValue={rating ? rating : 0}
       tintColor={color ? color : "black"}
-      ratingColor={theme.colors.orangeSegunda}
+      ratingColor={ratingColor ? ratingColor : theme.colors.orangeSegunda}
       // starStyle={{ color: "blue" }}
       readonly={readOnly ? true : false}
       type="custom"
