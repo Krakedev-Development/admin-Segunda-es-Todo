@@ -25,45 +25,51 @@ export const NewProducts = ({ navigation, route }) => {
     name: null,
     productId: "producto-" + length,
     description: null,
-    stock: null,
+    //stock: null,
     goldCoins: null,
     silverCoins: null,
-    goldRatio: null,
-    silverRatio: null,
-    category: { categoryId: "001", name: "dish" },
+    //goldRatio: null,
+    //silverRatio: null,
+    category: "Ceviches y encebollados",
     image: null,
     active: true,
   });
 
-  const filters = ["Platos", "Bebidas", "Regalos"];
-  const [filterSelected, setFilterSelected] = useState("Platos");
+  const filters = ["Ceviches y encebollados", "Bowls y Otros", "Bebidas"];
+  const [filterSelected, setFilterSelected] = useState(
+    "Ceviches y encebollados"
+  );
 
   useEffect(() => {
     console.log("NUEVO REGISTRO DE PRODUCTOS: ", newData);
   }, []);
 
   useEffect(() => {
-    console.log("ESTO TIENE EL COMBO: ", filterSelected);
-    switch (filterSelected) {
-      case "Platos":
-        setNewdata({
-          ...newData,
-          category: { categoryId: "001", name: "dish" },
-        });
-        break;
-      case "Bebidas":
-        setNewdata({
-          ...newData,
-          category: { categoryId: "002", name: "Bebidas" },
-        });
-        break;
-      case "Regalos":
-        setNewdata({
-          ...newData,
-          category: { categoryId: "003", name: "Regalos" },
-        });
-        break;
-    }
+    // console.log("ESTO TIENE EL COMBO: ", filterSelected);
+    // switch (filterSelected) {
+    //   case "Platos":
+    //     setNewdata({
+    //       ...newData,
+    //       category: filterSelected,
+    //     });
+    //     break;
+    //   case "Bebidas":
+    //     setNewdata({
+    //       ...newData,
+    //       category: filterSelected,
+    //     });
+    //     break;
+    //   case "Regalos":
+    //     setNewdata({
+    //       ...newData,
+    //       category: filterSelected,
+    //     });
+    //     break;
+    // }
+    setNewdata({
+      ...newData,
+      category: filterSelected,
+    });
   }, [filterSelected]);
 
   //   useEffect(() => {
@@ -173,7 +179,7 @@ export const NewProducts = ({ navigation, route }) => {
               }}
             />
           </View>
-          <View
+          {/* <View
             style={{
               width: "100%",
               marginRight: 5,
@@ -201,7 +207,7 @@ export const NewProducts = ({ navigation, route }) => {
                 setNewdata({ ...newData, stock: parseInt(txt) });
               }}
             />
-          </View>
+          </View> */}
         </View>
         <View style={{ flex: 1 }}>
           <StyledText
@@ -285,54 +291,10 @@ export const NewProducts = ({ navigation, route }) => {
           </View>
         </View>
         <View style={{ flex: 1, flexDirection: "row" }}>
-          <View style={{ width: "100%", marginRight: 5, flex: 1 }}>
-            <StyledText
-              style={{
-                fontFamily: theme.fonts.textBold,
-                color: "white",
-                marginBottom: 5,
-              }}
-            >
-              P.de oro:{" "}
-            </StyledText>
-
-            <TextInput
-              //contentStyle={{ width: "50%", backgroundColor: "pink" }}
-              value={newData.goldRatio ? newData.goldRatio.toString() : ""}
-              style={styles.textInput}
-              keyboardType="numeric"
-              placeholder={"P. de oro"}
-              onChangeText={(txt) => {
-                setNewdata({ ...newData, goldRatio: parseInt(txt) });
-              }}
-            />
-          </View>
-          <View style={{ width: "100%", marginRight: 5, flex: 1 }}>
-            <StyledText
-              style={{
-                fontFamily: theme.fonts.textBold,
-                color: "white",
-                marginBottom: 5,
-              }}
-            >
-              P.de plata:{" "}
-            </StyledText>
-
-            <TextInput
-              //contentStyle={{ width: "50%", backgroundColor: "pink" }}
-              value={newData.silverRatio ? newData.silverRatio.toString() : ""}
-              style={styles.textInput}
-              keyboardType="numeric"
-              placeholder={"P. de plata"}
-              onChangeText={(txt) => {
-                setNewdata({ ...newData, silverRatio: parseInt(txt) });
-              }}
-            />
-          </View>
           <View
             style={{
               //marginLeft: 5,
-              flex: 1.05,
+              flex: 1,
               height: 80,
               width: "100%",
               //marginTop: 10,
@@ -387,6 +349,50 @@ export const NewProducts = ({ navigation, route }) => {
               rowTextStyle={styles.dropdown1RowTxtStyle}
             />
           </View>
+          {/* <View style={{ width: "100%", marginRight: 5, flex: 1 }}>
+            <StyledText
+              style={{
+                fontFamily: theme.fonts.textBold,
+                color: "white",
+                marginBottom: 5,
+              }}
+            >
+              P.de oro:{" "}
+            </StyledText>
+
+            <TextInput
+              //contentStyle={{ width: "50%", backgroundColor: "pink" }}
+              value={newData.goldRatio ? newData.goldRatio.toString() : ""}
+              style={styles.textInput}
+              keyboardType="numeric"
+              placeholder={"P. de oro"}
+              onChangeText={(txt) => {
+                setNewdata({ ...newData, goldRatio: parseInt(txt) });
+              }}
+            />
+          </View>
+          <View style={{ width: "100%", marginRight: 5, flex: 1 }}>
+            <StyledText
+              style={{
+                fontFamily: theme.fonts.textBold,
+                color: "white",
+                marginBottom: 5,
+              }}
+            >
+              P.de plata:{" "}
+            </StyledText>
+
+            <TextInput
+              //contentStyle={{ width: "50%", backgroundColor: "pink" }}
+              value={newData.silverRatio ? newData.silverRatio.toString() : ""}
+              style={styles.textInput}
+              keyboardType="numeric"
+              placeholder={"P. de plata"}
+              onChangeText={(txt) => {
+                setNewdata({ ...newData, silverRatio: parseInt(txt) });
+              }}
+            />
+          </View> */}
         </View>
 
         <View style={{ flex: 2 }}>
@@ -499,7 +505,7 @@ const styles = StyleSheet.create({
 
   dropdown1BtnStyle: {
     flex: 1,
-    width: 125,
+    width: "60%",
     height: 30,
     backgroundColor: "rgba(248, 248, 255,0.93)",
     borderRadius: 8,

@@ -108,3 +108,15 @@ export const getDinamicDoc = async (collectionName, id) => {
     return null;
   }
 };
+
+export const getDinamicDocs = async (collectionName) => {
+  const querySnapshot = await getDocs(collection(global.dbCon, collectionName));
+  let data = [];
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    let docData = { ...doc.data(), id: doc.id };
+    data.push(docData);
+  });
+
+  return data;
+};
