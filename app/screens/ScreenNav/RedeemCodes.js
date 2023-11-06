@@ -440,24 +440,30 @@ export const RedeemCodes = () => {
         <h1>${specialCode ? "CÓDIGOS PROMOCIONALES" : "CODIGOS DE COMPRA"} ${
         generarNombreArchivoUnico().dateFormat
       }</h1>
-        <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between;">
-          ${qrCodes
-            .map((qrCodeInfo, index) => {
-              const { qrCode, uri } = qrCodeInfo;
-              return `
-                <div style="width: 48%; margin: 1%; box-sizing: border-box;">
-                  <p>ID: ${qrCode.id}</p>
-                  <p>MONEDAS DE ORO: ${qrCode.money.gold}</p>
-                  <p>MONEDAS DE PLATA: ${qrCode.money.silver}</p>
-                  <img src="file://${uri}" width="170" height="170" />
-                  ${
-                    qrCode.attempts ? `<p>INTENTOS: ${qrCode.attempts}</p>` : ""
-                  }
-                </div>
-              `;
-            })
-            .join("")}
-        </div>
+      <div style="width: 32%; margin: 1%; box-sizing: border-box; border-style: solid; display: flex; flex-direction: row; justify-content: center; align-items: center; flex: 1;">
+      <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; flex: 1;">
+        ${qrCodes
+          .map((qrCodeInfo, index) => {
+            const { qrCode, uri } = qrCodeInfo;
+            return `
+            <div style="width: 100%; margin: 1%; box-sizing: border-box; display: flex; flex: 1;">
+              <div style="flex: 1; margin: 1">
+                <img src="https://drive.google.com/uc?export=view&id=100pK5rHF8UVcp3NvGDSiLDiVvu4UGDxi" width="100" height="70" />
+                <p>Escanea el código en la app y reclama tus monedas</p>
+                <p>Oro: ${qrCode.money.gold} Plata: ${qrCode.money.silver}</p>
+                ${qrCode.attempts ? `<p>INTENTOS: ${qrCode.attempts}</p>` : ""}
+              </div>
+              <div style="flex: 1; margin: 1">
+                <img src="file://${uri}" width="100" height="100" />
+              </div>
+            </div>
+          `;
+          })
+          .join("")}
+      </div>
+    </div>
+    
+       
       </body>
       </html>
     `;
