@@ -27,12 +27,14 @@ import PDF from "react-native-pdf";
 import RNHTMLtoPDF from "react-native-html-to-pdf";
 import Modal from "react-native-modal";
 import { Icon } from "@rneui/base";
+import SelectDropdown from "react-native-select-dropdown";
 
 export const RedeemCodes = () => {
   const [gold, setGold] = useState("5");
   const [silver, setSilver] = useState("5");
   const [attempts, setAttempts] = useState("5");
   const [codesNumber, setCodesNumber] = useState("5");
+  const [type, setType] = useState("5");
   const [qrCodes, setQRCodes] = useState([]);
   const [qrCode, setQrCode] = useState(null);
   const [specialCode, setSpecialCode] = useState(false);
@@ -42,6 +44,9 @@ export const RedeemCodes = () => {
   const [dbCodes, setDdbCodes] = useState([]);
   const qrCodeRef = useRef(null);
   const viewShotRef = useRef(null);
+  const LOGO = require("../../../assets/Logo_gray.png");
+  const filters = ["5", "10", "20"];
+  const [filterSelected, setFilterSelected] = useState("5");
 
   useEffect(() => {
     console.log("ESTO TIENE QRCODES:", qrCodes);
@@ -369,7 +374,7 @@ export const RedeemCodes = () => {
 
   const handleDownloadQRCode = async () => {
     if (
-      (gold !== "0" && silver !== "0" && codesNumber !== "0") ||
+      (gold !== "0" && silver !== "0" && codesNumber !== "0" && type !== "0") ||
       (gold !== "0" &&
         silver !== "0" &&
         codesNumber !== "0" &&
@@ -388,10 +393,12 @@ export const RedeemCodes = () => {
             gold: gold ? parseInt(gold) : 0,
             silver: silver ? parseInt(silver) : 0,
           },
+          type: filterSelected,
         };
         if (specialCode && attempts) {
           codeQR.attempts = attempts;
           codeQR.dataClaimed = [];
+          delete codeQR.type;
         }
         console.log("ASI SE VA A LA BASE: ", codeQR);
         let firebaseCode = await createDinamicDocumentWithinId("codes", codeQR);
@@ -435,38 +442,73 @@ export const RedeemCodes = () => {
     try {
       // Crea una página HTML con los códigos QR y sus imágenes
       const htmlContent = `
-      <html>
-      <body>
-        <h1>${specialCode ? "CÓDIGOS PROMOCIONALES" : "CODIGOS DE COMPRA"} ${
+<html>
+<head>
+  <style>
+    /* Estilo para el contenedor principal */
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr repeat(4, 1fr); /* 6 filas con la primera fila auto */
+      grid-template-columns: 1fr repeat(4, 1fr); /* 5 columnas */
+      gap: 10px; /* Espacio entre celdas */
+      margin: 0;
+      height: 100vh; /* Ocupa toda la altura de la ventana */
+    }
+
+    /* Estilo para el título y la fecha */
+    h2 {
+      text-align: center;
+      grid-row: 1; /* Se coloca en la primera fila */
+      grid-column: 1 / span 5; /* Se extiende a lo ancho de las cinco columnas */
+    }
+
+    /* Estilo para el logotipo */
+    .logo {
+      grid-row: 1; /* Se coloca en la primera fila */
+      grid-column: 5; /* Se coloca en la quinta columna */
+      align-self: center;
+    }
+
+    /* Estilo para los códigos */
+    .grid-item {
+      border: 1px solid #000; /* Borde para separar las celdas */
+      padding: 10px; /* Espacio interno dentro de las celdas */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size:12;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>${specialCode ? "CÓDIGO PROMOCIONAL" : "CÓDIGO DE COMPRA"} - Fecha: ${
         generarNombreArchivoUnico().dateFormat
-      }</h1>
-      <div style="width: 32%; margin: 1%; box-sizing: border-box; border-style: solid; display: flex; flex-direction: row; justify-content: center; align-items: center; flex: 1;">
-      <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-between; flex: 1;">
-        ${qrCodes
-          .map((qrCodeInfo, index) => {
-            const { qrCode, uri } = qrCodeInfo;
-            return `
-            <div style="width: 100%; margin: 1%; box-sizing: border-box; display: flex; flex: 1;">
-              <div style="flex: 1; margin: 1">
-                <img src="https://drive.google.com/uc?export=view&id=100pK5rHF8UVcp3NvGDSiLDiVvu4UGDxi" width="100" height="70" />
-                <p>Escanea el código en la app y reclama tus monedas</p>
-                <p>Oro: ${qrCode.money.gold} Plata: ${qrCode.money.silver}</p>
-                ${qrCode.attempts ? `<p>INTENTOS: ${qrCode.attempts}</p>` : ""}
-              </div>
-              <div style="flex: 1; margin: 1">
-                <img src="file://${uri}" width="100" height="100" />
-              </div>
-            </div>
-          `;
-          })
-          .join("")}
+      }</h2>
+  <!-- Repite esto para cada elemento qrCode -->
+  ${qrCodes
+    .map((qrCodeInfo, index) => {
+      const { qrCode, uri } = qrCodeInfo;
+      return `
+      <div class="grid-item">
+        <p>ESCANEA EL CÓDIGO EN LA APP Y RECLAMA TUS MONEDAS</p>
+        ${qrCode.attempts ? `<p>INTENTOS: ${qrCode.attempts}</p>` : ""}
+        <img src="https://drive.google.com/uc?export=view&id=100pK5rHF8UVcp3NvGDSiLDiVvu4UGDxi" width="70" height="40" />
+        ${
+          !specialCode &&
+          ` <p style="margin:2; font-size:10;">${qrCode.type}</p>`
+        }
+        <img src="file://${uri}" width="100" height="100" style="margin: 3;"/>
       </div>
-    </div>
-    
-       
-      </body>
-      </html>
     `;
+    })
+    .join("")}
+</body>
+</html>
+`;
+
+      // Luego puedes usar htmlContent como desees, por ejemplo, para incrustarlo en una página HTML o enviarlo por correo electrónico.
 
       // Define las opciones para el PDF
       const options = {
@@ -677,6 +719,66 @@ export const RedeemCodes = () => {
               mode="outlined"
             />
           </View>
+          {!specialCode && (
+            <View
+              style={{
+                //flex: 0.3,
+                width: "90%",
+                height: 40,
+                //marginVertical: 5,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <StyledText>Valor de la factura: </StyledText>
+              </View>
+              <View
+                style={{
+                  flex: 0.8,
+                  //backgroundColor: "red",
+                  alignItems: "center",
+                }}
+              >
+                <SelectDropdown
+                  data={filters}
+                  onSelect={(selectedItem, index) => {
+                    console.log(selectedItem, index);
+                    setFilterSelected(selectedItem);
+                  }}
+                  //defaultButtonText={"Todos"}
+                  defaultValueByIndex={0}
+                  buttonTextAfterSelection={(selectedItem, index) => {
+                    // text represented after item is selected
+                    // if data array is an array of objects then return selectedItem.property to render after item is selected
+                    return selectedItem;
+                  }}
+                  rowTextForSelection={(item, index) => {
+                    // text represented for each item in dropdown
+                    // if data array is an array of objects then return item.property to represent item in dropdown
+                    return item;
+                  }}
+                  buttonStyle={styles.dropdown1BtnStyle}
+                  buttonTextStyle={styles.dropdown1BtnTxtStyle}
+                  renderDropdownIcon={(isOpened) => {
+                    return (
+                      <Icon
+                        name={isOpened ? "chevron-up" : "chevron-down"}
+                        type="font-awesome"
+                        color={"#444"}
+                        size={18}
+                      />
+                    );
+                  }}
+                  dropdownIconPosition={"right"}
+                  dropdownStyle={styles.dropdown1DropdownStyle}
+                  rowStyle={styles.dropdown1RowStyle}
+                  rowTextStyle={styles.dropdown1RowTxtStyle}
+                />
+              </View>
+            </View>
+          )}
           {specialCode && (
             <TextInput
               style={{ width: "90%", marginBottom: 15 }}
@@ -828,4 +930,57 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     alignItems: "center",
   },
+  dropdownsRow: {
+    flexDirection: "row",
+    width: "100%",
+    paddingHorizontal: "5%",
+  },
+
+  dropdown1BtnStyle: {
+    flex: 1,
+    width: 125,
+    height: 30,
+    backgroundColor: "#FFF",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#444",
+  },
+  dropdown1BtnTxtStyle: {
+    color: "#444",
+    textAlign: "left",
+    fontSize: 15,
+    fontFamily: theme.fonts.textBold,
+  },
+  dropdown1DropdownStyle: { backgroundColor: "#EFEFEF" },
+  dropdown1RowStyle: {
+    backgroundColor: "#EFEFEF",
+    borderBottomColor: "#C5C5C5",
+  },
+  dropdown1RowTxtStyle: {
+    color: "#444",
+    textAlign: "left",
+    fontSize: 15,
+    fontFamily: theme.fonts.textBold,
+  },
+  divider: { width: 12 },
+  dropdown2BtnStyle: {
+    flex: 1,
+    height: 40,
+    backgroundColor: "#FFF",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#444",
+  },
+  dropdown2BtnTxtStyle: {
+    color: "#444",
+    textAlign: "left",
+    fontSize: 15,
+    fontFamily: theme.fonts.textBold,
+  },
+  dropdown2DropdownStyle: { backgroundColor: "#EFEFEF" },
+  dropdown2RowStyle: {
+    backgroundColor: "#EFEFEF",
+    borderBottomColor: "#C5C5C5",
+  },
+  dropdown2RowTxtStyle: { color: "#444", textAlign: "left" },
 });

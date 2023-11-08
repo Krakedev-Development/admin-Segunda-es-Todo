@@ -43,6 +43,8 @@ import { NewTrivia } from "./app/screens/Trivia/NewTrivia";
 import { Products } from "./app/screens/Products/Products";
 import { LoginForm } from "./app/screens/LoginScreen/LoginScreen";
 import { NewProducts } from "./app/screens/Products/NewProducts";
+import { OrdersContext } from "./app/context/orders/OrdersContext";
+import { OrdersState } from "./app/context/orders/OrdersState";
 
 const LoginStack = createNativeStackNavigator();
 // const GroupStack = createNativeStackNavigator();
@@ -191,7 +193,7 @@ const BarNavigator = () => {
           ),
         })}
       /> */}
-      <TabBar.Screen
+      {/* <TabBar.Screen
         name="Promociones"
         component={Promotion}
         options={{
@@ -208,7 +210,7 @@ const BarNavigator = () => {
             );
           },
         }}
-      />
+      /> */}
       {/* <TabBar.Screen
         name="Predicciones"
         component={PredictionNav}
@@ -424,22 +426,22 @@ export default function App() {
   registarObserver();
 
   return (
-    // <PedidoContext.Provider value={{ user, setUser }}>
-    <FontsLoader>
-      <NavigationContainer>
-        <StatusBar
-          style={{
-            flex: 1,
-            backgroundColor: "#62CBDE",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        />
-        {login ? <MyDrawer /> : <MyDrawer />}
-        {/* {login ? <MyDrawer /> : <LoginNav />} */}
-      </NavigationContainer>
-    </FontsLoader>
-    // </PedidoContext.Provider>
+    <OrdersState>
+      <FontsLoader>
+        <NavigationContainer>
+          <StatusBar
+            style={{
+              flex: 1,
+              backgroundColor: "#62CBDE",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          />
+          {login ? <MyDrawer /> : <MyDrawer />}
+          {/* {login ? <MyDrawer /> : <LoginNav />} */}
+        </NavigationContainer>
+      </FontsLoader>
+    </OrdersState>
   );
 }
 const styles = StyleSheet.create({

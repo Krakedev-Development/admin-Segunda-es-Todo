@@ -30,8 +30,11 @@ import { Icon } from "@rneui/base";
 import { getDinamicDoc, updateDinamicDocument } from "../../Services/firebase";
 import { MoneysView } from "../../Components/MoneysView";
 import { FlatList } from "react-native";
+import { useContext } from "react";
+import { OrdersContext } from "../../context/orders/OrdersContext";
 
 export const Reedem = () => {
+  const { orders } = useContext(OrdersContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [orderClient, setOrderClient] = useState([]);
   const [redeemData, setRedeemData] = useState([]);
@@ -56,7 +59,11 @@ export const Reedem = () => {
 
   useEffect(() => {
     loadData();
-  }, [refresh]);
+  }, [orders]);
+
+  // useEffect(() => {
+  //   loadData();
+  // }, [refresh]);
 
   const cargarRDB = async () => {
     console.log(
@@ -68,27 +75,28 @@ export const Reedem = () => {
   };
 
   const loadData = async () => {
-    setLoad(true);
+    //setLoad(true);
     try {
-      const data = await fetchRedeemDB();
-      const sortedData = data.sort((a, b) => b.date - a.date);
+      //const data = await fetchRedeemDB();
+      console.log("Datos de canjes - - - ", orders);
+      const sortedData = orders.sort((a, b) => b.date - a.date);
       //const filter = sortedData.filter((order) => order?.status);
       console.log(
         "mi datos de canjes son-------------------------->",
         sortedData
       );
       setRedeemData(sortedData);
-    } catch (error) { }
-    setLoad(false);
+    } catch (error) {}
+    //setLoad(false);
   };
 
   const updateRedeemStatus = async (id) => {
     try {
       await updateRedeemDB(id);
-    } catch (error) { }
+    } catch (error) {}
 
     setModalVisible(false);
-    loadData();
+    //loadData();
   };
 
   const openAppSettings = () => {
@@ -185,7 +193,7 @@ export const Reedem = () => {
           >
             <StyledText
               subheading
-            //style={{ fontFamily: FONTS[900] }}
+              //style={{ fontFamily: FONTS[900] }}
             >
               ESCANEA EL CÓDIGO QR
             </StyledText>
@@ -249,7 +257,7 @@ export const Reedem = () => {
                   flex: 1,
                   //backgroundColor: "red",
                   width: "100%",
-                  height: '100%',
+                  height: "100%",
                   padding: 10,
                 }}
               >
@@ -401,14 +409,12 @@ export const Reedem = () => {
                     </ScrollView> */}
                     <FlatList
                       data={orderData.products}
-                      style={
-                        {
-                          flex: 1,
-                          //height: "60%",
-                          //width: "100%",
-                          //backgroundColor: "pink",
-                        }
-                      }
+                      style={{
+                        flex: 1,
+                        //height: "60%",
+                        //width: "100%",
+                        //backgroundColor: "pink",
+                      }}
                       keyExtractor={(item, index) => item.id.toString()}
                       renderItem={({ item, index }) => {
                         return (
@@ -435,7 +441,11 @@ export const Reedem = () => {
                             >
                               <Image
                                 source={{ uri: item.image }}
-                                style={{ width: 80, height: 80, resizeMode: 'stretch' }}
+                                style={{
+                                  width: 80,
+                                  height: 80,
+                                  resizeMode: "stretch",
+                                }}
                               />
                             </View>
                             <View
@@ -685,7 +695,7 @@ export const Reedem = () => {
                   type="feather"
                   size={25}
                   color={"white"}
-                //style={{ flex: 1 }}
+                  //style={{ flex: 1 }}
                 />
               </View>
             </TouchableOpacity>
@@ -891,9 +901,9 @@ export const Reedem = () => {
                     >
                       {orderClient?.client?.name
                         ? orderClient?.client?.name.concat(
-                          " ",
-                          orderClient?.client?.lastName
-                        )
+                            " ",
+                            orderClient?.client?.lastName
+                          )
                         : "a"}
                     </StyledText>
                   </View>
@@ -1257,7 +1267,7 @@ export const Reedem = () => {
                 <StyledText
                   subheading
                   color={"white"}
-                //fontFamily={FONTS.bold_700}
+                  //fontFamily={FONTS.bold_700}
                 >
                   Escanear código QR
                 </StyledText>
