@@ -374,11 +374,11 @@ export const RedeemCodes = () => {
 
   const handleDownloadQRCode = async () => {
     if (
-      (gold !== "0" && silver !== "0" && codesNumber !== "0" && type !== "0") ||
-      (gold !== "0" &&
-        silver !== "0" &&
-        codesNumber !== "0" &&
-        attempts !== "0" &&
+      (gold !== "" && silver !== "" && codesNumber !== "" && type !== "") ||
+      (gold !== "" &&
+        silver !== "" &&
+        codesNumber !== "" &&
+        attempts !== "" &&
         specialCode)
     ) {
       console.log("GENERANDO - - - - -");
@@ -508,11 +508,78 @@ export const RedeemCodes = () => {
 </html>
 `;
 
+      const htmlContentSpecial = `<html>
+<head>
+  <style>
+    /* Estilo para el contenedor principal */
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr repeat(4, 1fr); /* 6 filas con la primera fila auto */
+      grid-template-columns: 1fr repeat(4, 1fr); /* 5 columnas */
+      gap: 10px; /* Espacio entre celdas */
+      margin: 0;
+      height: 100vh; /* Ocupa toda la altura de la ventana */
+    }
+
+    /* Estilo para el título y la fecha */
+    h2 {
+      text-align: center;
+      grid-row: 1; /* Se coloca en la primera fila */
+      grid-column: 1 / span 5; /* Se extiende a lo ancho de las cinco columnas */
+    }
+
+    /* Estilo para el logotipo */
+    .logo {
+      grid-row: 1; /* Se coloca en la primera fila */
+      grid-column: 5; /* Se coloca en la quinta columna */
+      align-self: center;
+    }
+
+    /* Estilo para los códigos */
+    .grid-item {
+      border: 1px solid #000; /* Borde para separar las celdas */
+      padding: 10px; /* Espacio interno dentro de las celdas */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size:12;
+      text-align: center;
+      width: 60vh;
+    }
+    
+    .image {
+      margin:10px 0px
+    }
+  </style>
+</head>
+<body>
+  <h2>${specialCode ? "CÓDIGO PROMOCIONAL" : "CÓDIGO DE COMPRA"} - Fecha: ${
+        generarNombreArchivoUnico().dateFormat
+      }</h2>
+  <!-- Repite esto para cada elemento qrCode -->
+  ${qrCodes
+    .map((qrCodeInfo, index) => {
+      const { qrCode, uri } = qrCodeInfo;
+      return `
+      <div class="grid-item">
+        <p>ESCANEA EL CÓDIGO EN LA APP Y RECLAMA TUS MONEDAS</p>
+        ${qrCode.attempts ? `<p>INTENTOS: ${qrCode.attempts}</p>` : ""}
+        <img src="https://drive.google.com/uc?export=view&id=100pK5rHF8UVcp3NvGDSiLDiVvu4UGDxi" width="110" height="80" />
+        
+        <img src="file://${uri}" width="230" height="230" class="image"/>
+      </div>
+    `;
+    })
+    .join("")}
+</body>
+</html>`;
+
       // Luego puedes usar htmlContent como desees, por ejemplo, para incrustarlo en una página HTML o enviarlo por correo electrónico.
 
       // Define las opciones para el PDF
       const options = {
-        html: htmlContent,
+        html: specialCode ? htmlContentSpecial : htmlContent,
         fileName: generarNombreArchivoUnico().fileName, // Nombre del archivo PDF
         directory: "Documents", // Cambia la ubicación
         height: 842, // Tamaño de página A4 (tamaño predeterminado)
